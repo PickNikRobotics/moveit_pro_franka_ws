@@ -6,6 +6,7 @@ Hardware-specific configuration packages for using [Franka Research 3 (FR3)](htt
 
 - **franka_arm_hw** — Single-arm hardware configuration
 - **franka_dual_arm_hw** — Dual-arm hardware configuration
+- **franka_base_config** — Shared base configuration for Franka hardware packages
 - **franka_behaviors** — Franka-specific behaviors (e.g., gripper grasp/move actions)
 - **franka_ros2** — Franka ROS 2 driver stack (submodule)
 
