@@ -1,0 +1,4 @@
+[submodule "franka_ros2"]
+	path = franka_ros2
+	url = https://github.com/PickNikRobotics/franka_ros2.git
+	branch = humble-fixes
