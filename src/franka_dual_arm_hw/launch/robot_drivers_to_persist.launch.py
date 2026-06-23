@@ -45,9 +45,6 @@
 ############################################################################
 
 
-import os
-import sys
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -58,11 +55,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
-# Add the path to the `utils` folder
-package_share = get_package_share_directory("franka_bringup")
-utils_path = os.path.join(package_share, "..", "..", "lib", "franka_bringup", "utils")
-sys.path.append(os.path.abspath(utils_path))
 
 # Iterates over the uncommented lines in file specified by the robot_config_file parameter.
 # "Includes" franka.launch.py for each active (uncommented) Robot.
@@ -93,6 +85,8 @@ def generate_robot_nodes(context):
                 "urdf_file": "fr3/fr3.urdf.xacro",
                 "robot_ip": "172.16.0.4",
                 "load_gripper": "true",
+                # MOCK HARDWARE: set to "true" to load mock_components/GenericSystem instead
+                # of the real Franka driver (no robot/FCI connection needed). "false" = real FR3.
                 "use_fake_hardware": "false",
                 "fake_sensor_commands": "false",
                 "joint_sources": "joint_state_broadcaster, left_velocity_force_controller",
@@ -119,6 +113,8 @@ def generate_robot_nodes(context):
                 "urdf_file": "fr3/fr3.urdf.xacro",
                 "robot_ip": "172.16.0.5",
                 "load_gripper": "true",
+                # MOCK HARDWARE: set to "true" to load mock_components/GenericSystem instead
+                # of the real Franka driver (no robot/FCI connection needed). "false" = real FR3.
                 "use_fake_hardware": "false",
                 "fake_sensor_commands": "false",
                 "joint_sources": "joint_states, franka_gripper/joint_states",

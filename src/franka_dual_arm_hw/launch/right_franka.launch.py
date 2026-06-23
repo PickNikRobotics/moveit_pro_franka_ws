@@ -128,6 +128,19 @@ def generate_robot_nodes(context):
     joint_state_rate = int(LaunchConfiguration("joint_state_rate").perform(context))
 
     nodes = [
+        # Jazzy's controller_manager reads robot_description from a (latched) topic, not a
+        # parameter, so it needs a robot_state_publisher in this namespace to publish
+        # /<ns>/robot_description or it hangs on "Waiting for data on 'robot_description'".
+        # The MoveIt Pro agent's combined dual-arm RSP owns /tf, so remap this per-arm RSP's
+        # TF outputs to sinks to avoid two publishers fighting for TF authority.
+        Node(
+            package="robot_state_publisher",
+            executable="robot_state_publisher",
+            namespace=namespace,
+            parameters=[{"robot_description": robot_description}],
+            remappings=[("/tf", "tf_unused"), ("/tf_static", "tf_static_unused")],
+            output="screen",
+        ),
         Node(
             package="controller_manager",
             executable="ros2_control_node",
