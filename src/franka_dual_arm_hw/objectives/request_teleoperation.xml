@@ -23,6 +23,22 @@
   >
     <Control ID="Sequence">
       <Action ID="Script" code="teleop_mode := 0" />
+      <!--
+        DoTeleoperateAction only writes its outputs (controllers / planning_groups /
+        tip_links / skip_collision_checks / velocity_scale_factor) once the web UI sends
+        its first feedback message. With initial_teleop_mode=1 (joint jog) the jog branch
+        below ticks immediately and SwitchController / JointJog read {controllers},
+        {planning_groups} and {skip_collision_checks} before that feedback arrives, which
+        fails with "blackboard variable ... not found". Seed them here with the right-arm
+        defaults so the first tick is valid; DoTeleoperateAction overwrites them on feedback.
+        (Script cannot build string vectors, so SetBlackboard is used; a single value is
+        read back as a one-element vector.)
+      -->
+      <Action ID="SetBlackboard" output_key="controllers" value="joint_velocity_controller" />
+      <Action ID="SetBlackboard" output_key="planning_groups" value="right_manipulator" />
+      <Action ID="SetBlackboard" output_key="tip_links" value="right_fr3_link8" />
+      <Action ID="SetBlackboard" output_key="skip_collision_checks" value="false" />
+      <Action ID="SetBlackboard" output_key="velocity_scale_factor" value="0.3" />
       <Control ID="Parallel" success_count="1" failure_count="1">
         <Action
           ID="DoTeleoperateAction"
