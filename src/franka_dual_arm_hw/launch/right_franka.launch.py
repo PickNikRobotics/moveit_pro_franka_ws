@@ -163,11 +163,30 @@ def generate_robot_nodes(context):
             remappings=[("/left/joint_states", "/joint_states")],
             output="screen",
         ),
+        # Active arm motion controller (mirrors franka_arm_hw, where
+        # joint_trajectory_controller is the sole controller active at startup).
         Node(
             package="controller_manager",
             executable="spawner",
             namespace=namespace,
-            arguments=["joint_trajectory_controller", "--inactive"],
+            arguments=["joint_trajectory_controller"],
+            output="screen",
+        ),
+        # Loaded but inactive, available to switch to later (mirrors the
+        # franka_arm_hw inactive-at-startup set). joint_velocity_controller is
+        # the controller this config's joint_jog.yaml drives for Joint Jog.
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            namespace=namespace,
+            arguments=["velocity_force_controller", "--inactive"],
+            output="screen",
+        ),
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            namespace=namespace,
+            arguments=["joint_velocity_controller", "--inactive"],
             output="screen",
         ),
         # Node(
