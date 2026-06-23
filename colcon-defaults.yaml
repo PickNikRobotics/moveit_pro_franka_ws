@@ -1,0 +1,61 @@
+# Contains colcon default settings for user overlay containers.
+build:
+  # Enable this for bidirectional syncing from the UI
+  symlink-install: true
+  allow-overriding:
+    - robotiq_description
+    - ur_description
+  mixin:
+    # Enable ccache support
+    - ccache
+    # Multithreaded linker to speed up linking step during compilation
+    - lld
+    - compile-commands
+    # Debug info and build testing for dev workflows
+    - rel-with-deb-info
+    - build-testing-on
+    - coverage-gcc
+    - coverage-pytest
+    # Custom mixin (see mixin/disable-libfranka-tests.mixin). Must stay LAST: it
+    # appends -DBUILD_TESTS=OFF to cmake-args so it extends rather than replaces.
+    # libfranka is the only package using BUILD_TESTS; its tests need GTest::gmock,
+    # which the container's system GTest config lacks, and we skip them at test time.
+    - disable-libfranka-tests
+  packages-skip:
+    # franka_ros2 packages that are not Jazzy-ready and/or not needed for the
+    # FR3 arm/dual-arm hardware configs in this workspace. We build only
+    # franka_hardware, franka_gripper, franka_robot_state_broadcaster,
+    # franka_semantic_components and franka_msgs from the franka_ros2 submodule.
+    - franka_bringup
+    - franka_example_controllers
+    - franka_fr3_moveit_config
+    - franka_gazebo_bringup
+    - franka_ign_ros2_controls
+    - franka_mobile
+    - franka_mobile_fr3_duo_moveit_config
+    - franka_mobile_sensors
+    - mobile_fr3_duo_trajectory_controller
+    - franka_selfcollision
+    - franka_vision_and_manipulation_kit
+    - integration_launch_testing
+    # Pure metapackage that depends on the skipped franka_bringup / *_moveit_config /
+    # gazebo / example_controllers packages, so it can't build while those are skipped.
+    # Nothing in the workspace depends on it; concrete packages depend on the real ones.
+    - franka_ros2
+test:
+  event-handlers:
+    - console_direct+
+    - desktop_notification+
+  packages-skip:
+    - libfranka
+    - franka_bringup
+    - franka_example_controllers
+    - franka_fr3_moveit_config
+    - franka_gazebo_bringup
+    - franka_ign_ros2_control
+    - franka_gripper
+    - franka_hardware
+    - franka_robot_state_broadcaster
+    - franka_ros2
+    - franka_semantic_components
+    - integration_launch_testing

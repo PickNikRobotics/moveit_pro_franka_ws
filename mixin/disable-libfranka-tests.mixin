@@ -1,0 +1,7 @@
+{
+    "build": {
+        "disable-libfranka-tests": {
+            "cmake-args": ["-DBUILD_TESTS=OFF"]
+        }
+    }
+}
