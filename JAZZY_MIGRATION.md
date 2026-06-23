@@ -237,6 +237,44 @@ arguments in `left_franka.launch.py` / `right_franka.launch.py`. Each namespace 
 Their `command_interfaces` were likewise aligned to `["velocity"]`. `franka_robot_state_broadcaster`
 remains commented out in the per-arm launches (its dual-arm wiring is unverified — see caveats).
 
+## 10. Teleoperation objectives
+
+Adapted from the meta_ws `franka_arm_hw` `teleoperate.xml` / `request_teleoperation.xml`
+(the standard MoveIt Pro teleop subtree: gripper open/close, joint-slider interpolate,
+interactive-marker move-to-pose, waypoint move-to-joint-state, Cartesian jog, joint jog).
+
+### Single arm (`franka_arm_hw`)
+
+Copied essentially verbatim — same robot as the reference (`manipulator`, `grasp_link`,
+`joint_trajectory_controller` active, `jtc` pipeline). `Teleoperate` invokes
+`Request Teleoperation`, which uses the existing `Close Gripper` / `Open Gripper`
+objectives and the core `Move to Pose` / `Move to Joint State` / `Interpolate to Joint State`
+subtrees.
+
+### Dual arm (`franka_dual_arm_hw`) — right arm only
+
+The dual config runs **two namespaced controller_managers** (`/left`, `/right`). The
+teleop objective here is scoped to the **right arm** (`right_manipulator`,
+`right_fr3_link8`, `/right/joint_trajectory_controller`):
+
+- Jog modes (joint / Cartesian) point `SwitchController` at
+  `/right/controller_manager/{list,switch}_controllers` via its action-name ports, so
+  they drive the right arm. These are the supported teleop paths.
+- **Known limitation:** the core `Move to Pose` / `Move to Joint State` /
+  `Interpolate to Joint State` subtrees (teleop modes 3/4/5) run an internal
+  `SwitchController` against the default, un-namespaced `/controller_manager`, with no
+  port to override the namespace. That manager doesn't exist in this two-namespace setup,
+  so those modes are not expected to work as-is.
+- Added right-arm `close_gripper.xml` / `open_gripper.xml` (the dual config had none) so
+  the gripper modes resolve. They drive `/right/franka_gripper/gripper_action` — the
+  franka_gripper node runs in the `right` namespace (matches the meta_ws
+  `/<ns>/franka_gripper/gripper_action` convention).
+
+> Aside: the **single-arm** gripper objectives use `/fr3_gripper/gripper_action`
+> (and `close_gripper.xml` even uses `/fr3_gripper/gripper`), omitting the
+> `/franka_gripper/` node level that the v3.3.0 `gripper.launch.py` actually creates.
+> Pre-existing; left as-is, flagged for follow-up.
+
 ---
 
 ## Build
