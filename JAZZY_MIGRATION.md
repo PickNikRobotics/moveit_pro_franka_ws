@@ -8,7 +8,7 @@ The changes were validated against a known-good Jazzy 9.3.0 workspace (`meta_ws`
 uses the same `franka_arm_hw` / `franka_base_config` packages and the same `franka_ros2`
 submodule.
 
-Branch: `migrate/moveit-pro-9-jazzy` (5 logical commits).
+Branch: `migrate/moveit-pro-9-jazzy` (logical commits — see `git log`).
 
 ---
 
@@ -277,6 +277,102 @@ teleop objective here is scoped to the **right arm** (`right_manipulator`,
 
 ---
 
+## 11. Mock-hardware bring-up (fixes found running both configs locally)
+
+Bringing both configs up against `mock_components/GenericSystem` (no real FR3 / FCI)
+surfaced a set of latent migration bugs — each one blocked *real* hardware too, since the
+URDF/SRDF/launch wiring is shared. All of the fixes below are kept on by default; the
+mock-vs-real choice is a small, documented toggle (see "Enabling mock hardware" at the end).
+
+### 11.1 `franka_description` 2.7.1 URDF macro signature (both arms)
+
+`description/franka.urdf.xacro` (single **and** dual) called `xacro:franka_robot` with the
+old signature — `arm_id="fr3"` plus `joint_limits`/`inertials`/`kinematics`/`dynamics`
+loaded via `xacro.load_yaml`. The pinned `franka_description` 2.7.1 macro instead takes
+`robot_type` and loads those tables internally, so the old call aborted with
+`Invalid parameter "arm_id"` and the URDF never parsed (mock or real). Updated both files to
+`robot_type="fr3"` and removed the four `load_yaml` params. The single-arm file also gained a
+`use_fake_hardware` arg (default `false`) threaded into the macro, used by the optional mock
+toggle.
+
+### 11.2 Single-arm SRDF robot name + waypoint group
+
+- `franka_base_config/config/moveit/franka.srdf`: `<robot name="franka">` → `<robot name="fr3">`.
+  It must match the URDF robot name (`fr3`, as in meta_ws); otherwise MoveIt drops the
+  semantic description (`"Semantic description is not specified for the same robot as the
+  URDF"`) and **no planning groups load**.
+- `franka_arm_hw/waypoints/waypoints.yaml`: the `Home` waypoint referenced group `arm`,
+  which doesn't exist — changed to `manipulator` (the SRDF group, and the config's
+  `joint_group_name`).
+
+### 11.3 `franka_behaviors` excluded from behavior discovery (`COLCON_IGNORE`)
+
+§8 dropped `franka_behaviors` from the *build*, but the agent still aborted on startup:
+
+```
+Failed to load library `franka_behaviors::FrankaBehaviorsLoader` ... does not exist
+```
+
+The objective server's behavior scanner (`moveit_studio_utils_py/system_config.py`) walks
+`<ws>/src` and merges the `behavior_loader_plugins` from every package that has a
+`behavior_plugin.yaml`, **skipping a directory only if it contains `COLCON_IGNORE`** — it does
+*not* honor `MOVEIT_PRO_IGNORE`. So `src/franka_behaviors/behavior_plugin.yaml` was still
+discovered, its loader requested, and — since the package isn't built — pluginlib failed and
+crashed the agent. Fix: add `src/franka_behaviors/COLCON_IGNORE` (this also redundantly
+drops it from the build). This blocked **both** configs.
+
+### 11.4 Dual-arm controller bring-up on Jazzy
+
+The dual config runs two namespaced `ros2_control_node`s (`/left`, `/right`) started by the
+per-arm launches. Three Jazzy issues stopped the controllers from coming up:
+
+- **Dead `franka_bringup` import** — `robot_drivers_to_persist.launch.py` called
+  `get_package_share_directory("franka_bringup")` at module import to append a `utils` path
+  to `sys.path` that nothing used. `franka_bringup` isn't installed, so the import threw and
+  the whole drivers launch died. Removed the dead import (and the now-unused `os`/`sys`/
+  `get_package_share_directory` imports).
+- **`robot_description` not published per namespace** — Jazzy's `controller_manager` reads
+  `robot_description` from a (latched) topic, not the node parameter the launches passed, so
+  both managers hung on *"Waiting for data on 'robot_description' topic"*. Added a
+  `robot_state_publisher` in each namespace (`left_franka.launch.py` / `right_franka.launch.py`)
+  to publish `/<ns>/robot_description`, with `/tf` + `/tf_static` remapped to sinks so the
+  agent's combined dual-arm RSP keeps sole TF authority.
+- **Control YAML not namespaced** — `{left,right}_franka_ros2_control.yaml` used bare
+  top-level keys (`controller_manager:`, `joint_trajectory_controller:`, …), which resolve to
+  `/controller_manager` etc. and never reach the `/left`–`/right` nodes, so controllers loaded
+  with *"The 'type' param was not defined"*. Prefixed every node key with its namespace
+  (`/left/…`, `/right/…`).
+
+After these, both arms load mock hardware and `joint_state_broadcaster` +
+`joint_trajectory_controller` go active in each namespace; `/joint_states` aggregates at
+50 Hz across all 18 joints.
+
+### 11.5 Dual-arm teleop blackboard seeding
+
+`objectives/request_teleoperation.xml` failed immediately with
+`The input port 'activate_controllers' was set to '{controllers}', which was not found`.
+`DoTeleoperateAction` *outputs* `controllers` / `planning_groups` / `tip_links` /
+`skip_collision_checks` / `velocity_scale_factor`, but only once the web UI sends its first
+feedback. With `initial_teleop_mode=1` (joint jog) the jog branch ticks before that feedback,
+reading keys that don't exist yet. (The single-arm objective dodges this only because it
+defaults to mode 3, which doesn't read `{controllers}`.) Fix: seed those keys with the
+right-arm defaults via `SetBlackboard` before the teleop `Parallel`; `DoTeleoperateAction`
+overwrites them on UI feedback. The modes-3/4/5 `/controller_manager` limitation in §10 is
+unchanged.
+
+### Enabling mock hardware
+
+Both configs ship in **real-hardware** mode. To run mock locally:
+
+- **Single arm** — in `franka_arm_hw/config/config.yaml`: set `simulated: True` and uncomment
+  `- use_fake_hardware: "true"` under `robot_description.urdf_params`.
+- **Dual arm** — in `franka_dual_arm_hw/launch/robot_drivers_to_persist.launch.py`: set
+  `use_fake_hardware` to `"true"` for both arms.
+
+Both are marked with `MOCK HARDWARE:` comments at the exact lines.
+
+---
+
 ## Build
 
 ```bash
@@ -287,10 +383,14 @@ moveit_pro run -c franka_arm_hw
 
 ## Open items / caveats
 
-- **Dual-arm runtime wiring is not verified.** The static references are fixed and the
-  config loads, but the two-namespace runtime behavior can only be validated on a real
-  robot / sim. In particular `config/moveit/joint_jog.yaml` lists `joint_velocity_controller`
-  for both arms, which MoveIt Pro Joint Jog would need to address per-namespace
-  (`left/…`, `right/…`). The single-arm config is the clean, primary path.
+- **Dual-arm now verified in mock** (see §11): both namespaced controller_managers load mock
+  hardware, controllers activate, and `/joint_states` streams at 50 Hz. Still unverified:
+  end-to-end **jogging** from the web UI (the `JointJog`/`PoseJog` nodes must address the
+  controller per-namespace — `right/…`), and any behavior on a real robot / sim. The
+  single-arm config remains the clean, primary path.
+- **Dual-arm teleop modes 3/4/5** (Move to Pose / Joint State / Interpolate) still can't work
+  in the two-namespace setup — their core subtrees hardcode the un-namespaced
+  `/controller_manager` (§10, §11.5). Consolidating both arms onto a single
+  `controller_manager` would remove this limitation.
 - **`SwitchController` activation** in `draw.xml` relies on `automatic_deactivation`
   defaulting to true; confirm the controller switch behaves as intended once running.

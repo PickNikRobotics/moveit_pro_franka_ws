@@ -11,6 +11,9 @@ hardware:
   # Set simulated to false if you are using this as a configuration for real hardware.
   # This allows users to switch between mock and real hardware using the same configuration.
   # [Required]
+  # MOCK HARDWARE: for local testing without a real Franka, set this to True *and*
+  # uncomment `use_fake_hardware` under robot_description.urdf_params below. Leave both at
+  # their real-hardware defaults (simulated: False, no use_fake_hardware) to drive the FR3.
   simulated: False
 
   # If the MoveIt Pro Agent should launch the ros2 controller node.
@@ -40,6 +43,9 @@ hardware:
     # [Optional]
     urdf_params:
       - robot_ip: "192.168.19.21"
+      # MOCK HARDWARE: uncomment the next line (and set `simulated: True` above) to load
+      # mock_components/GenericSystem instead of the real Franka driver — no robot/FCI needed.
+      # - use_fake_hardware: "true"
     simulated_hardware_launch_file:
       package: "moveit_studio_agent"
       path: "launch/blank.launch.py"
