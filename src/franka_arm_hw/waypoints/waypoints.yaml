@@ -1,7 +1,7 @@
 - description: ''
   favorite: false
   joint_group_names:
-  - arm
+  - manipulator
   joint_state:
     effort: []
     header:
