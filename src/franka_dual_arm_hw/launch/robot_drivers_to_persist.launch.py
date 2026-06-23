@@ -80,7 +80,7 @@ def generate_robot_nodes(context):
             PythonLaunchDescriptionSource(
                 PathJoinSubstitution(
                     [
-                        FindPackageShare("franka_dual_arm_config_hw"),
+                        FindPackageShare("franka_dual_arm_hw"),
                         "launch",
                         "left_franka.launch.py",
                     ]
@@ -106,7 +106,7 @@ def generate_robot_nodes(context):
             PythonLaunchDescriptionSource(
                 PathJoinSubstitution(
                     [
-                        FindPackageShare("franka_dual_arm_config_hw"),
+                        FindPackageShare("franka_dual_arm_hw"),
                         "launch",
                         "right_franka.launch.py",
                     ]
@@ -163,7 +163,7 @@ def generate_launch_description():
                 "robot_config_file",
                 default_value=PathJoinSubstitution(
                     [
-                        FindPackageShare("franka_dual_arm_config_hw"),
+                        FindPackageShare("franka_dual_arm_hw"),
                         "config/control",
                         "franka.config.yaml",
                     ]

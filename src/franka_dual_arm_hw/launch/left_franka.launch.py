@@ -117,7 +117,7 @@ def generate_robot_nodes(context):
     namespace = LaunchConfiguration("namespace").perform(context)
     controllers_yaml = PathJoinSubstitution(
         [
-            FindPackageShare("franka_dual_arm_config_hw"),
+            FindPackageShare("franka_dual_arm_hw"),
             "config/control",
             "left_franka_ros2_control.yaml",
         ]

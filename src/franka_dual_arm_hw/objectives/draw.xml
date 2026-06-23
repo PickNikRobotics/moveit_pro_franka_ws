@@ -15,7 +15,10 @@
         publish_rate="50"
       />
       <Control ID="Sequence" name="TopLevelSequence">
-        <Action ID="ActivateControllers" controller_names="{controller_name}" />
+        <!-- MoveIt Pro 9.0: ActivateControllers was removed; use SwitchController.
+             activate_controllers takes a ';'-separated controller list. Conflicting
+             controllers are auto-deactivated (automatic_deactivation defaults to true). -->
+        <Action ID="SwitchController" activate_controllers="{controller_name}" />
         <Action
           ID="LoadPoseStampedVectorFromYaml"
           output="{pose_stamped_msgs}"

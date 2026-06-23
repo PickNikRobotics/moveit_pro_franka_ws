@@ -4,7 +4,8 @@
 #
 ###############################################################
 
-based_on_package: "franka_dual_arm_config"
+# This config is self-contained (it carries its own moveit/ + control/ files),
+# so it does not inherit from a base config package.
 # Baseline hardware configuration parameters for MoveIt Pro.
 # [Required]
 hardware:
@@ -30,9 +31,9 @@ hardware:
     urdf:
       package: "franka_dual_arm_hw"
       path: "description/franka.urdf.xacro"
-    #srdf:
-    #  package: "franka_dual_arm_config"
-    #  path: "config/moveit/franka.srdf"
+    srdf:
+      package: "franka_dual_arm_hw"
+      path: "config/moveit/franka.srdf"
     # Specify any additional parameters required for the URDF.
     # Many of these are specific to the UR descriptions packages, and can be customized as needed.
     # [Optional]
@@ -51,16 +52,16 @@ moveit_params:
   joint_group_name: "right_manipulator"
 
   kinematics:
-    package: "dual_arm_sim"
+    package: "franka_dual_arm_hw"
     path: "config/moveit/pose_ik_distance.yaml"
   sensors_3d:
-    package: "dual_arm_sim"
+    package: "franka_dual_arm_hw"
     path: "config/moveit/sensors_3d.yaml"
   joint_limits:
-    package: "dual_arm_sim"
+    package: "franka_dual_arm_hw"
     path: "config/moveit/joint_limits.yaml"
   pose_jog:
-    package: "dual_arm_sim"
+    package: "franka_dual_arm_hw"
     path: "config/moveit/pose_jog.yaml"
   joint_jog:
     package: "franka_dual_arm_hw"
@@ -104,34 +105,32 @@ objectives:
       package_name: "moveit_pro_objectives"
       relative_path: "objectives/perception"
     custom_objectives:
-      package_name: "franka_dual_arm_hw_config"
+      package_name: "franka_dual_arm_hw"
       relative_path: "objectives"
   # Specify the location of the saved waypoints file.
   # [Required]
-  #waypoints_file:
-  #  package_name: "dual_arm_sim"
-  #  relative_path: "waypoints/waypoints.yaml"
+  waypoints_file:
+    package_name: "franka_dual_arm_hw"
+    relative_path: "waypoints/waypoints.yaml"
 # Configuration for launching ros2_control processes.
 # [Required, if using ros2_control]
 ros2_control:
+  # NOTE: launch_control_node is False above — the two per-arm ros2_control_nodes are
+  # started by robot_drivers_to_persist.launch.py (left/right_franka.launch.py), each in
+  # its own "left"/"right" namespace with its own controller yaml. MoveIt Pro still
+  # resolves this path (it is read unconditionally), so it must point at a real file; the
+  # contents are not used here because MoveIt Pro does not launch the controller node.
   config:
-    package: "franka_dual_arm_hw_config"
-    path: "config/control/franka_ros2_control.yaml"
-  # MoveIt Pro will load and activate these controllers at start up to ensure they are available.
-  # If not specified, it is up to the user to ensure the appropriate controllers are active and available
-  # for running the application.
+    package: "franka_dual_arm_hw"
+    path: "config/control/left_franka_ros2_control.yaml"
+  # The per-arm controllers live in the "left"/"right" namespaces and are spawned by the
+  # persist launch files (joint_state_broadcaster + joint_trajectory_controller per arm).
+  # MoveIt Pro's startup spawners run un-namespaced against a default controller_manager
+  # that does not exist in this setup, so these lists are intentionally left empty.
   # [Optional, default=[]]
-  controllers_active_at_startup:
-    - "joint_state_broadcaster"
-    - "joint_trajectory_controller"
-    #- "left_franka_robot_state_broadcaster"
-    #- "right_franka_robot_state_broadcaster"
-  # Load but do not start these controllers so they can be activated later if needed.
+  controllers_active_at_startup: []
   # [Optional, default=[]]
-  controllers_inactive_at_startup:
-    #- "joint_trajectory_admittance_controller"
-    - "left_velocity_force_controller"
-    - "right_velocity_force_controller"
+  controllers_inactive_at_startup: []
   # Any controllers here will not be spawned by MoveIt Pro.
   # [Optional, default=[]]
   controllers_not_managed: []
