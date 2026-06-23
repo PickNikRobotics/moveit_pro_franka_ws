@@ -39,7 +39,10 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "robot_ip": "192.168.19.21",
-                    "joint_names": '["fr3_finger_joint1","fr3_finger_joint2"]',
+                    # franka_ros2 v3.3.0 gripper.launch.py requires 'namespace' (no default) and
+                    # derives joint_names from robot_type internally (fr3 -> fr3_finger_joint1/2).
+                    # Use "fr3_gripper" so actions are /fr3_gripper/... (matches the gripper objectives).
+                    "namespace": "fr3_gripper",
                 }.items(),
             )
         ]

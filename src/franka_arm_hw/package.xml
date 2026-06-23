@@ -17,6 +17,13 @@
   <exec_depend>moveit_studio_agent</exec_depend>
   <exec_depend>moveit_pro_behavior</exec_depend>
 
+  <!-- Real-hardware franka stack. On Humble these came from the MoveIt Pro image; on Jazzy they're
+       vendored from source (franka_ros2), so they must be declared here to be built + installed. -->
+  <exec_depend>franka_hardware</exec_depend>
+  <exec_depend>franka_gripper</exec_depend>
+  <exec_depend>franka_robot_state_broadcaster</exec_depend>
+  <exec_depend>franka_semantic_components</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
 
   <test_depend>ament_clang_format</test_depend>
