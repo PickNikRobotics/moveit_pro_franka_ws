@@ -3,14 +3,13 @@
   <xacro:arg name="robot_ip" default="TODO" />
   <xacro:arg name="ee_id" default="franka_hand" />
   <xacro:arg name="rpy_ee" default="0 0 -0.78539" />
+  <xacro:arg name="use_fake_hardware" default="false" />
 
   <!-- Load Franka robot -->
   <xacro:include filename="$(find franka_description)/robots/common/franka_robot.xacro"/>
-  <xacro:franka_robot arm_id="fr3"
-                      joint_limits="${xacro.load_yaml('$(find franka_description)/robots/fr3/joint_limits.yaml')}"
-                      inertials="${xacro.load_yaml('$(find franka_description)/robots/fr3/inertials.yaml')}"
-                      kinematics="${xacro.load_yaml('$(find franka_description)/robots/fr3/kinematics.yaml')}"
-                      dynamics="${xacro.load_yaml('$(find franka_description)/robots/fr3/dynamics.yaml')}"
+  <!-- franka_description 2.7.1 selects joint_limits/inertials/kinematics/dynamics
+       internally from robot_type; they are no longer passed as macro params. -->
+  <xacro:franka_robot robot_type="fr3"
                       gazebo="false"
                       hand="true"
                       tcp_xyz="0 0 0.1034"
@@ -18,7 +17,7 @@
                       with_sc="false"
                       ros2_control="true"
                       robot_ip="192.168.19.21"
-                      use_fake_hardware="false"
+                      use_fake_hardware="$(arg use_fake_hardware)"
                       fake_sensor_commands="false"
                       gazebo_effort="false"
                       no_prefix="false"
