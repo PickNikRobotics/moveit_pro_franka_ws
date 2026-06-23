@@ -42,6 +42,12 @@ build:
     # gazebo / example_controllers packages, so it can't build while those are skipped.
     # Nothing in the workspace depends on it; concrete packages depend on the real ones.
     - franka_ros2
+    # The single custom behavior this package provided (FrankaGraspAction) is no
+    # longer used: grasp_object.xml now calls the core MoveGripperAction via the
+    # "Close Gripper" objective. The package also fails to configure on Jazzy
+    # because its transitive moveit_pro_behavior -> moveit_pro_mpc -> PCL -> VTK 9.1
+    # chain references an MPI::MPI_C target that nothing defines. Skipped.
+    - franka_behaviors
 test:
   event-handlers:
     - console_direct+
@@ -58,4 +64,5 @@ test:
     - franka_robot_state_broadcaster
     - franka_ros2
     - franka_semantic_components
+    - franka_behaviors
     - integration_launch_testing

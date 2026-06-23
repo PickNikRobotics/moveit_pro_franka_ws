@@ -3,21 +3,11 @@
   <!--//////////-->
   <BehaviorTree
     ID="Grasp Object"
-    _description="Tries to grasp at the desired width with a desired force while closing with the given speed. The operation is successful if the distance 
- between the gripper fingers is within the given epsilon range."
+    _description="Grasp an object by closing the gripper."
     _favorite="true"
   >
     <Control ID="Sequence" name="TopLevelSequence">
-      <Action
-        ID="FrankaGraspAction"
-        speed="0.100000"
-        timeout="10.000000"
-        action_name="/fr3_gripper/grasp"
-        force="70.0"
-        width="0.0"
-        inner_epsilon="0.005000"
-        outer_epsilon="0.0600"
-      />
+      <SubTree ID="Close Gripper" _collapsed="true" />
     </Control>
   </BehaviorTree>
   <TreeNodesModel>
