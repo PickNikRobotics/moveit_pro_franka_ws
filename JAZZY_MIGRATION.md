@@ -192,9 +192,12 @@ needed, so we drop the package instead.)
   `/fr3_gripper/gripper`, so no custom behavior is required.
 - **`colcon-defaults.yaml`** — `franka_behaviors` added to both the build and test
   `packages-skip` lists.
-- The package source is left in `src/franka_behaviors/` (not built); the
-  `FrankaBehaviorsLoader` was never registered in any config's `behavior_loader_plugins`,
-  so nothing else references it.
+- The package source is left in `src/franka_behaviors/` (not built). The
+  `FrankaBehaviorsLoader` was never registered in any config's `behavior_loader_plugins` —
+  but that is **not** sufficient on its own: the objective server auto-discovers
+  `behavior_plugin.yaml` files under `src/` and tries to load their (unbuilt) loaders, which
+  crashes the agent. A `COLCON_IGNORE` marker is required to exclude it from that scan too —
+  see §11.3.
 
 > Note: `franka_behaviors/franka_grasp_action.hpp` also `#include`d
 > `franka_msgs/action/move.hpp` but never used the `Move` action — only `Grasp` was
@@ -259,7 +262,8 @@ teleop objective here is scoped to the **right arm** (`right_manipulator`,
 
 - Jog modes (joint / Cartesian) point `SwitchController` at
   `/right/controller_manager/{list,switch}_controllers` via its action-name ports, so
-  they drive the right arm. These are the supported teleop paths.
+  they drive the right arm. These are the supported teleop paths. (Starting in joint-jog
+  mode also requires seeding the teleop blackboard inputs — see §11.5.)
 - **Known limitation:** the core `Move to Pose` / `Move to Joint State` /
   `Interpolate to Joint State` subtrees (teleop modes 3/4/5) run an internal
   `SwitchController` against the default, un-namespaced `/controller_manager`, with no
