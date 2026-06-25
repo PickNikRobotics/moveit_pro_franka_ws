@@ -32,6 +32,7 @@
                       use_fake_hardware="$(arg use_fake_hardware)"
                       fake_sensor_commands="false"
                       gazebo_effort="false"
+                      is_async="true"
                       no_prefix="false"
                       arm_prefix="right_"
                       connected_to= "right_mount">
@@ -63,6 +64,7 @@
                       use_fake_hardware="$(arg use_fake_hardware)"
                       fake_sensor_commands="false"
                       gazebo_effort="false"
+                      is_async="true"
                       no_prefix="false"
                       arm_prefix="left_"
                       connected_to= "left_mount">
