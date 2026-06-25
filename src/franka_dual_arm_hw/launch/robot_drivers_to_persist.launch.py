@@ -13,159 +13,61 @@
 #  limitations under the License.
 
 ############################################################################
-# Parameters:
-# controller_name: Name of the controller to spawn (required, no default)
-# robot_config_file: Path to the robot configuration file to load
-#                   (default: franka.config.yaml in franka_bringup/config)
+# Dual-arm FR3 gripper drivers (persisted for the Agent's lifetime).
 #
-# The example.launch.py launch file provides a flexible and unified interface
-# for launching Franka Robotics example controllers via the 'controller_name'
-# parameter, such as 'elbow_example_controller'.
-# Example:
-# ros2 launch franka_bringup example.launch.py controller_name:=elbow_example_controller
+# The single un-namespaced controller_manager (launched by the MoveIt Pro Agent)
+# drives both ARMS via franka_hardware/FrankaHardwareInterface. The FR3 GRIPPERS,
+# however, are NOT ros2_control controllers -- they are driven by the libfranka
+# `franka_gripper_node` action server. This launch file brings up one gripper node
+# per arm, namespaced "left"/"right", so their action servers live at
+#   /left/franka_gripper/...   and   /right/franka_gripper/...
+# (open_gripper.xml / close_gripper.xml target /right/franka_gripper/gripper_action).
 #
-# This script "includes" franka.launch.py to declare core component nodes,
-# including: robot_state_publisher, ros2_control_node, joint_state_publisher,
-# joint_state_broadcaster, franka_robot_state_broadcaster, and optionally
-# franka_gripper and rviz, with support for namespaced and non-namespaced
-# environments as defined in franka.config.yaml. RViz is launched if
-# 'use_rviz' is set to true in the configuration file.
-#
-# The default robot_config_file is franka.config.yaml in the
-# franka_bringup/config directory. See that file for its own documentation.
-#
-# This approach improves upon the earlier individual launch scripts, which
-# varied in structure and lacked namespace support, offering a more consistent
-# and maintainable solution. While some may favor the older scripts for their
-# specific use cases, example.launch.py enhances scalability and ease of use
-# for a wide range of Franka Robotics applications.
-#
-# Ensure the specified  controller_name matches a controller defined in
-#  controllers.yaml to avoid runtime errors.
+# MoveIt Pro includes this file (config.yaml hardware.robot_driver_persist_launch_file)
+# with NO launch arguments when hardware.simulated is False, so the per-arm robot IPs
+# are declared here as defaults. KEEP THESE IN SYNC with config.yaml
+# hardware.robot_description.urdf_params (left_robot_ip / right_robot_ip).
 ############################################################################
-
 
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
     IncludeLaunchDescription,
-    OpaqueFunction,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-# Iterates over the uncommented lines in file specified by the robot_config_file parameter.
-# "Includes" franka.launch.py for each active (uncommented) Robot.
-# That file is well documented.
-# The function also checks if the 'use_rviz' parameter is set to true in the YAML file.
-# If so, it includes a node for RViz to visualize the robot's state.
-# The function returns a list of nodes to be launched.
 
-
-def generate_robot_nodes(context):
-    nodes = []
-    # Left arm
-    nodes.append(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                PathJoinSubstitution(
-                    [
-                        FindPackageShare("franka_dual_arm_hw"),
-                        "launch",
-                        "left_franka.launch.py",
-                    ]
-                )
-            ),
-            launch_arguments={
-                "arm_id": "",
-                "arm_prefix": "left",
-                "namespace": "left",
-                "urdf_file": "fr3/fr3.urdf.xacro",
-                "robot_ip": "172.16.0.4",
-                "load_gripper": "true",
-                # MOCK HARDWARE: set to "true" to load mock_components/GenericSystem instead
-                # of the real Franka driver (no robot/FCI connection needed). "false" = real FR3.
-                "use_fake_hardware": "false",
-                "fake_sensor_commands": "false",
-                "joint_sources": "joint_state_broadcaster, left_velocity_force_controller",
-                "joint_state_rate": "30",
-            }.items(),
-        )
-    )
-    # Right arm
-    nodes.append(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                PathJoinSubstitution(
-                    [
-                        FindPackageShare("franka_dual_arm_hw"),
-                        "launch",
-                        "right_franka.launch.py",
-                    ]
-                )
-            ),
-            launch_arguments={
-                "arm_id": "",
-                "arm_prefix": "right",
-                "namespace": "right",
-                "urdf_file": "fr3/fr3.urdf.xacro",
-                "robot_ip": "172.16.0.5",
-                "load_gripper": "true",
-                # MOCK HARDWARE: set to "true" to load mock_components/GenericSystem instead
-                # of the real Franka driver (no robot/FCI connection needed). "false" = real FR3.
-                "use_fake_hardware": "false",
-                "fake_sensor_commands": "false",
-                "joint_sources": "joint_states, franka_gripper/joint_states",
-                "joint_state_rate": "30",
-            }.items(),
-        )
-    )
-    nodes.append(
-        Node(
-            package="joint_state_publisher",
-            executable="joint_state_publisher",
-            name="joint_state_publisher",
-            parameters=[
-                {
-                    "source_list": [
-                        "right/joint_states",
-                        "right/franka_gripper/joint_states",
-                        "left/joint_states",
-                        "left/franka_gripper/joint_states",
-                    ],
-                    "rate": 50,
-                    "use_robot_description": False,
-                }
-            ],
-            output="screen",
+def gripper_launch(namespace, robot_ip):
+    return IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("franka_gripper"),
+                    "launch",
+                    "gripper.launch.py",
+                ]
+            )
         ),
+        launch_arguments={
+            "robot_ip": robot_ip,
+            "namespace": namespace,
+            "robot_type": "fr3",
+            # Real hardware: connect to the physical gripper over the FCI.
+            # (This persist launch is only loaded when hardware.simulated is False.)
+            "use_fake_hardware": "false",
+        }.items(),
     )
-    return nodes
-
-
-# The generate_launch_description function is the entry point (like "main")
-# It is called by the ROS 2 launch system when the launch file is executed.
-# via: ros2 launch franka_bringup example.launch.py ARGS...
-# This function must return a LaunchDescription object containing nodes to be launched.
-# it calls the generate_robot_nodes function to get the list of nodes to be launched.
 
 
 def generate_launch_description():
     return LaunchDescription(
         [
-            DeclareLaunchArgument(
-                "robot_config_file",
-                default_value=PathJoinSubstitution(
-                    [
-                        FindPackageShare("franka_dual_arm_hw"),
-                        "config/control",
-                        "franka.config.yaml",
-                    ]
-                ),
-                description="Path to the robot configuration file to load",
-            ),
-            OpaqueFunction(function=generate_robot_nodes),
+            # Defaults mirror config.yaml urdf_params; keep them in sync.
+            DeclareLaunchArgument("left_robot_ip", default_value="192.168.1.21"),
+            DeclareLaunchArgument("right_robot_ip", default_value="192.168.1.22"),
+            gripper_launch("left", LaunchConfiguration("left_robot_ip")),
+            gripper_launch("right", LaunchConfiguration("right_robot_ip")),
         ]
     )

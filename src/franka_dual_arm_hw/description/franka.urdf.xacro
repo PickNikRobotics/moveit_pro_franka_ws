@@ -4,6 +4,10 @@
   <xacro:arg name="left_robot_ip" default="172.16.0.4" />
   <xacro:arg name="ee_id" default="franka_hand" />
   <xacro:arg name="rpy_ee" default="0 0 -0.785" />
+  <!-- MOCK HARDWARE: default true loads mock_components/GenericSystem for both arms
+       (no robot/FCI needed). Set to false (via config.yaml urdf_params) to drive the
+       real dual FR3 with two franka_hardware/FrankaHardwareInterface systems. -->
+  <xacro:arg name="use_fake_hardware" default="true" />
 
   <!-- Load Franka robot -->
   <xacro:include filename="$(find franka_description)/robots/common/franka_robot.xacro"/>
@@ -14,26 +18,30 @@
     <origin xyz="0.035 -0.050681 0.356" rpy="0.8936 -0.1746 0.4636"/>
   </joint>
   <!-- franka_description 2.7.1 selects joint_limits/inertials/kinematics/dynamics
-       internally from robot_type; they are no longer passed as macro params. -->
+       internally from robot_type; they are no longer passed as macro params.
+       ros2_control="true" emits one <ros2_control> system per arm (left_/right_),
+       both loaded by the single un-namespaced controller_manager. -->
   <xacro:franka_robot robot_type="fr3"
                       gazebo="false"
                       hand="true"
                       tcp_xyz="0 0 0.1034"
                       ee_id="$(arg ee_id)"
                       with_sc="false"
-                      ros2_control="false"
+                      ros2_control="true"
                       robot_ip="$(arg right_robot_ip)"
-                      use_fake_hardware="false"
+                      use_fake_hardware="$(arg use_fake_hardware)"
                       fake_sensor_commands="false"
                       gazebo_effort="false"
                       no_prefix="false"
                       arm_prefix="right_"
                       connected_to= "right_mount">
   </xacro:franka_robot>
-  <link name="grasp_link" />
-  <joint name="grasp_link_joint" type="fixed">
-     <parent link="world"/>
-     <child link = "grasp_link"/>
+
+  <!-- This link aligns the axes of the grasp frame to our required convention for motion planning tasks. -->
+  <link name="right_grasp_link" />
+  <joint name="right_grasp_link_joint" type="fixed">
+     <parent link="right_fr3_hand_tcp"/>
+     <child link = "right_grasp_link"/>
      <origin xyz="0 0 0" rpy="0 0 -1.5708"/>
   </joint>
 
@@ -50,20 +58,20 @@
                       tcp_xyz="0 0 0.1034"
                       ee_id="$(arg ee_id)"
                       with_sc="false"
-                      ros2_control="false"
+                      ros2_control="true"
                       robot_ip="$(arg left_robot_ip)"
-                      use_fake_hardware="false"
+                      use_fake_hardware="$(arg use_fake_hardware)"
                       fake_sensor_commands="false"
                       gazebo_effort="false"
                       no_prefix="false"
                       arm_prefix="left_"
                       connected_to= "left_mount">
   </xacro:franka_robot>
-  
-    <!-- This link aligns the axes of the grasp frame to our required convention for motion planning tasks. -->
+
+   <!-- This link aligns the axes of the grasp frame to our required convention for motion planning tasks. -->
    <link name="left_grasp_link" />
    <joint name="left_grasp_link_joint" type="fixed">
-      <parent link="world"/>
+      <parent link="left_fr3_hand_tcp"/>
       <child link = "left_grasp_link"/>
       <origin xyz="0 0 0" rpy="0 0 -1.5708"/>
     </joint>

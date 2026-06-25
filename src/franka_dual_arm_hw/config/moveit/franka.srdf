@@ -10,12 +10,15 @@
     <link name="right_fr3_leftfinger"/>
     <link name="right_fr3_rightfinger"/>
     <link name="right_fr3_hand_tcp"/>
-    <!--<link name="right_grasp_link"/>-->
+    <!-- grasp_link must be in the end-effector group: the teleop interactive marker
+         requires the manipulator's tip frame (right_grasp_link) to be a link of the
+         end_effector group attached to right_manipulator. -->
+    <link name="right_grasp_link"/>
     <joint name="right_fr3_finger_joint1"/>
     <passive_joint name="right_fr3_finger_joint2"/>
   </group>
   <group name="right_manipulator">
-    <chain base_link="right_fr3_link0" tip_link="right_fr3_link8"/>
+    <chain base_link="right_fr3_link0" tip_link="right_grasp_link"/>
   </group>
   <!-- Left arm -->
   <group name="left_arm">
@@ -26,12 +29,15 @@
     <link name="left_fr3_leftfinger"/>
     <link name="left_fr3_rightfinger"/>
     <link name="left_fr3_hand_tcp"/>
-    <!--<link name="left_grasp_link"/>-->
+    <!-- grasp_link must be in the end-effector group: the teleop interactive marker
+         requires the manipulator's tip frame (left_grasp_link) to be a link of the
+         end_effector group attached to left_manipulator. -->
+    <link name="left_grasp_link"/>
     <joint name="left_fr3_finger_joint1"/>
     <passive_joint name="left_fr3_finger_joint2"/>
   </group>
   <group name="left_manipulator">
-    <chain base_link="left_fr3_link0" tip_link="left_fr3_link8"/>
+    <chain base_link="left_fr3_link0" tip_link="left_grasp_link"/>
   </group>
 
   <!-- Group containing both arms -->
@@ -40,8 +46,10 @@
     <group name="right_manipulator"/>
   </group>
 
-  <end_effector name="left_hand_tcp" parent_link="left_fr3_link8" group="left_hand" parent_group="left_arm"/>
-  <end_effector name="right_hand_tcp" parent_link="right_fr3_link8" group="right_hand" parent_group="right_arm"/>
+  <!-- End effectors attach to the *_manipulator groups (the ones used by teleop / pose jog)
+       with the grasp_link tip, so the web UI can place the 6-DOF interactive marker. -->
+  <end_effector name="left_hand_tcp" parent_link="left_grasp_link" group="left_hand" parent_group="left_manipulator"/>
+  <end_effector name="right_hand_tcp" parent_link="right_grasp_link" group="right_hand" parent_group="right_manipulator"/>
 
   <!-- Arm collisions -->
   <virtual_joint name="right_virtual_joint" type="fixed" parent_frame="right_mount" child_link="right_fr3_link0"/>

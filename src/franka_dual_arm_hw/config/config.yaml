@@ -6,23 +6,43 @@
 
 # This config is self-contained (it carries its own moveit/ + control/ files),
 # so it does not inherit from a base config package.
+
+# Sets ROS global params for launch.
+# [Optional]
+# Mock hardware (GenericSystem) publishes no /clock, so sim time must stay off.
+# The single-arm config inherits this from franka_base_config; this self-contained
+# config sets it explicitly.
+ros_global_params:
+  use_sim_time: False
+
 # Baseline hardware configuration parameters for MoveIt Pro.
 # [Required]
 hardware:
   # Set simulated to false if you are using this as a configuration for real hardware.
   # This allows users to switch between mock and real hardware using the same configuration.
   # [Required]
+  # MOCK HARDWARE: simulated: True + use_fake_hardware: "true" (urdf_params below)
+  # loads mock_components/GenericSystem for both arms under one controller_manager -- no
+  # robot/FCI needed. For real dual FR3s set simulated: False and use_fake_hardware: "false".
+  # REAL HARDWARE (current): simulated: False drives the real dual FR3.
   simulated: False
 
-  # If the MoveIt Pro Agent should launch the ros2 controller node.
+  # The MoveIt Pro Agent launches the single un-namespaced controller_manager from the
+  # combined URDF (both arms' ros2_control systems). This replaces the old per-arm
+  # namespaced drivers, which the stock teleop/jog behaviors cannot drive.
   # [Optional, default=True]
-  launch_control_node: False
+  launch_control_node: True
 
   # If the MoveIt Pro Agent should launch the robot state publisher.
   # This should be false if you are launching the robot state publisher as part of drivers.
   # [Optional, default=True]
   launch_robot_state_publisher: True
 
+  # REAL HARDWARE ONLY: persisted drivers launched for the Agent's lifetime. The single
+  # controller_manager drives both ARMS, but the FR3 GRIPPERS are libfranka action
+  # servers (not ros2_control), so they are launched here -- one franka_gripper node per
+  # arm, namespaced left/right. Only loaded when simulated: False; on mock the grippers
+  # are published via joint_state_broadcaster.extra_joints instead.
   robot_driver_persist_launch_file:
     package: "franka_dual_arm_hw"
     path: "launch/robot_drivers_to_persist.launch.py"
@@ -40,6 +60,10 @@ hardware:
     urdf_params:
       - left_robot_ip: "192.168.1.21"
       - right_robot_ip: "192.168.1.22"
+      # MOCK HARDWARE: "true" loads mock_components/GenericSystem for both arms.
+      # REAL HARDWARE (current): "false" drives the real dual FR3
+      # (franka_hardware/FrankaHardwareInterface, connecting to the FCI IPs above).
+      - use_fake_hardware: "false"
     simulated_hardware_launch_file:
       package: "moveit_studio_agent"
       path: "launch/blank.launch.py"
@@ -74,7 +98,7 @@ moveit_params:
     transforms_updates: True
 
   trajectory_execution:
-    manage_controllers: False
+    manage_controllers: True
     allowed_execution_duration_scaling: 2.0
     allowed_goal_duration_margin: 5.0
     allowed_start_tolerance: 0.01
@@ -115,22 +139,32 @@ objectives:
 # Configuration for launching ros2_control processes.
 # [Required, if using ros2_control]
 ros2_control:
-  # NOTE: launch_control_node is False above — the two per-arm ros2_control_nodes are
-  # started by robot_drivers_to_persist.launch.py (left/right_franka.launch.py), each in
-  # its own "left"/"right" namespace with its own controller yaml. MoveIt Pro still
-  # resolves this path (it is read unconditionally), so it must point at a real file; the
-  # contents are not used here because MoveIt Pro does not launch the controller node.
   config:
     package: "franka_dual_arm_hw"
-    path: "config/control/left_franka_ros2_control.yaml"
-  # The per-arm controllers live in the "left"/"right" namespaces and are spawned by the
-  # persist launch files (joint_state_broadcaster + joint_trajectory_controller per arm).
-  # MoveIt Pro's startup spawners run un-namespaced against a default controller_manager
-  # that does not exist in this setup, so these lists are intentionally left empty.
+    path: "config/control/franka_ros2_control.yaml"
+  # MoveIt Pro will load and activate these controllers at start up to ensure they are available.
   # [Optional, default=[]]
-  controllers_active_at_startup: []
+  controllers_active_at_startup:
+    - "joint_state_broadcaster"
+    - "joint_trajectory_controller"
+    # REAL HARDWARE ONLY: the franka robot-state broadcasters need the franka robot_state
+    # interface, which mock_components/GenericSystem does not provide. Comment these two
+    # out again when switching back to mock (simulated: True / use_fake_hardware: "true").
+    - "left_franka_robot_state_broadcaster"
+    - "right_franka_robot_state_broadcaster"
+  # Load but do not start these controllers so they can be activated later (e.g. by teleop
+  # switching from the combined JTC into per-arm jog controllers).
   # [Optional, default=[]]
-  controllers_inactive_at_startup: []
+  controllers_inactive_at_startup:
+    - "left_joint_velocity_controller"
+    - "right_joint_velocity_controller"
+    - "left_velocity_force_controller"
+    - "right_velocity_force_controller"
+    # UI shim controllers: loaded (so their parameter services exist for the teleop
+    # UI's hardcoded /joint_velocity_controller and /velocity_force_controller reads)
+    # but never activated. See config/control/franka_ros2_control.yaml for details.
+    - "joint_velocity_controller"
+    - "velocity_force_controller"
   # Any controllers here will not be spawned by MoveIt Pro.
   # [Optional, default=[]]
   controllers_not_managed: []
