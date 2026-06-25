@@ -24,6 +24,17 @@ On Jazzy the franka driver packages (`franka_hardware`, `franka_gripper`,
 
 ## Build
 
+The quickest way to set up the workspace from scratch is the `setup_jazzy.sh` script in
+the repo root. It updates the git submodules, runs `moveit_pro configure`, regenerates the
+`.env` file (ensuring `MOVEIT_ROS_DISTRO=jazzy`), and builds the user image + workspace:
+
+```bash
+./setup_jazzy.sh
+moveit_pro run -c franka_arm_hw
+```
+
+To run the steps manually instead:
+
 ```bash
 git submodule update --init --recursive   # fetch franka_ros2, libfranka, franka_description
 moveit_pro build                           # builds the Jazzy user image + workspace
