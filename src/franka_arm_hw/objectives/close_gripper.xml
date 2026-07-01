@@ -4,7 +4,7 @@
     <Control ID="Sequence" name="root">
       <Action
         ID="MoveGripperAction"
-        gripper_command_action_name="/fr3_gripper/gripper"
+        gripper_command_action_name="/fr3_gripper/franka_gripper/gripper_action"
         position="0.009"
         timeout="10.000000"
       />
