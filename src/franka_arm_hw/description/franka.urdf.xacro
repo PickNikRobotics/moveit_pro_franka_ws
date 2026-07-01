@@ -21,6 +21,7 @@
                       fake_sensor_commands="false"
                       gazebo_effort="false"
                       is_async="true"
+                      threaded_priority="80"
                       no_prefix="false"
                       arm_prefix=""
                       connected_to= "world">
