@@ -16,11 +16,15 @@ build:
     - build-testing-on
     - coverage-gcc
     - coverage-pytest
-    # Custom mixin (see mixin/disable-libfranka-tests.mixin). Must stay LAST: it
-    # appends -DBUILD_TESTS=OFF to cmake-args so it extends rather than replaces.
-    # libfranka is the only package using BUILD_TESTS; its tests need GTest::gmock,
-    # which the container's system GTest config lacks, and we skip them at test time.
+    # Custom mixins (see mixin/disable-libfranka-tests.mixin,
+    # mixin/disable-libfranka-examples.mixin). Must stay LAST: each appends to
+    # cmake-args (-DBUILD_TESTS=OFF / -DBUILD_EXAMPLES=OFF) so they extend rather
+    # than replace. libfranka is the only package using BUILD_TESTS; its tests need
+    # GTest::gmock, which the container's system GTest config lacks, and we skip
+    # them at test time. libfranka's examples trigger a GCC 13 internal compiler
+    # error (ICE) on the Jazzy/Noble base image, so we disable them too.
     - disable-libfranka-tests
+    - disable-libfranka-examples
   packages-skip:
     # franka_ros2 packages that are not Jazzy-ready and/or not needed for the
     # FR3 arm/dual-arm hardware configs in this workspace. We build only
