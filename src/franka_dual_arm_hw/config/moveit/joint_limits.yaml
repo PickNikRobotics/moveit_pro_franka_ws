@@ -7,7 +7,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_joint2:
     has_position_limits: true
@@ -16,7 +16,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_joint3:
     has_position_limits: true
@@ -25,7 +25,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_joint4:
     has_position_limits: true
@@ -34,7 +34,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_joint5:
     has_position_limits: true
@@ -43,7 +43,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 5.26
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_joint6:
     has_position_limits: true
@@ -52,7 +52,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 4.18
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_joint7:
     has_position_limits: true
@@ -61,7 +61,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 5.26
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   left_fr3_hand_joint:
     has_position_limits: true
@@ -80,7 +80,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_joint2:
     has_position_limits: true
@@ -89,7 +89,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_joint3:
     has_position_limits: true
@@ -98,7 +98,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_joint4:
     has_position_limits: true
@@ -107,7 +107,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.62
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_joint5:
     has_position_limits: true
@@ -116,7 +116,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 5.26
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_joint6:
     has_position_limits: true
@@ -125,7 +125,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 4.18
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_joint7:
     has_position_limits: true
@@ -134,7 +134,7 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 5.26
     has_acceleration_limits: true
-    max_acceleration: 10.0
+    max_acceleration: 9.8
 
   right_fr3_hand_joint:
     has_position_limits: true
