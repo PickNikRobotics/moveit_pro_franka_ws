@@ -13,8 +13,10 @@ endforeach()
 
 add_library(
   franka_behaviors
-  SHARED 
+  SHARED
   src/franka_grasp_action.cpp
+  src/set_force_torque_collision_behavior.cpp
+  src/set_full_collision_behavior.cpp
   src/register_behaviors.cpp)
 target_include_directories(
   franka_behaviors
