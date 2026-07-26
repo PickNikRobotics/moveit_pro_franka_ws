@@ -1,4 +1,10 @@
-[submodule "franka_ros2"]
-	path = franka_ros2
-	url = https://github.com/PickNikRobotics/franka_ros2.git
-	branch = humble-fixes
+[submodule "src/external_dependencies/franka_ros2"]
+	path = src/external_dependencies/franka_ros2
+	url = https://github.com/frankarobotics/franka_ros2.git
+	branch = jazzy
+[submodule "src/external_dependencies/libfranka"]
+	path = src/external_dependencies/libfranka
+	url = https://github.com/frankarobotics/libfranka.git
+[submodule "src/external_dependencies/franka_description"]
+	path = src/external_dependencies/franka_description
+	url = https://github.com/frankarobotics/franka_description.git

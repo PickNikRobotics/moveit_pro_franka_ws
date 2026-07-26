@@ -1,0 +1,7 @@
+{
+    "build": {
+        "disable-libfranka-examples": {
+            "cmake-args": ["-DBUILD_EXAMPLES=OFF"]
+        }
+    }
+}

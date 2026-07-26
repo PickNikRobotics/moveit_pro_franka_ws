@@ -1,0 +1,173 @@
+###############################################################
+#
+#  This configures the robot to work with MoveIt Pro
+#
+###############################################################
+
+# This config is self-contained (it carries its own moveit/ + control/ files),
+# so it does not inherit from a base config package.
+
+# Sets ROS global params for launch.
+# [Optional]
+# Mock hardware (GenericSystem) publishes no /clock, so sim time must stay off.
+# The single-arm config inherits this from franka_base_config; this self-contained
+# config sets it explicitly.
+ros_global_params:
+  use_sim_time: False
+
+# Baseline hardware configuration parameters for MoveIt Pro.
+# [Required]
+hardware:
+  # Set simulated to false if you are using this as a configuration for real hardware.
+  # This allows users to switch between mock and real hardware using the same configuration.
+  # [Required]
+  # MOCK HARDWARE: simulated: True + use_fake_hardware: "true" (urdf_params below)
+  # loads mock_components/GenericSystem for both arms under one controller_manager -- no
+  # robot/FCI needed. For real dual FR3s set simulated: False and use_fake_hardware: "false".
+  # REAL HARDWARE (current): simulated: False drives the real dual FR3.
+  simulated: False
+
+  # The MoveIt Pro Agent launches the single un-namespaced controller_manager from the
+  # combined URDF (both arms' ros2_control systems). This replaces the old per-arm
+  # namespaced drivers, which the stock teleop/jog behaviors cannot drive.
+  # [Optional, default=True]
+  launch_control_node: True
+
+  # If the MoveIt Pro Agent should launch the robot state publisher.
+  # This should be false if you are launching the robot state publisher as part of drivers.
+  # [Optional, default=True]
+  launch_robot_state_publisher: True
+
+  # REAL HARDWARE ONLY: persisted drivers launched for the Agent's lifetime. The single
+  # controller_manager drives both ARMS, but the FR3 GRIPPERS are libfranka action
+  # servers (not ros2_control), so they are launched here -- one franka_gripper node per
+  # arm, namespaced left/right. Only loaded when simulated: False; on mock the grippers
+  # are published via joint_state_broadcaster.extra_joints instead.
+  robot_driver_persist_launch_file:
+    package: "franka_dual_arm_hw"
+    path: "launch/robot_drivers_to_persist.launch.py"
+
+  robot_description:
+    urdf:
+      package: "franka_dual_arm_hw"
+      path: "description/franka.urdf.xacro"
+    srdf:
+      package: "franka_dual_arm_hw"
+      path: "config/moveit/franka.srdf"
+    # Specify any additional parameters required for the URDF.
+    # Many of these are specific to the UR descriptions packages, and can be customized as needed.
+    # [Optional]
+    urdf_params:
+      - left_robot_ip: "192.168.1.21"
+      - right_robot_ip: "192.168.1.22"
+      # MOCK HARDWARE: "true" loads mock_components/GenericSystem for both arms.
+      # REAL HARDWARE (current): "false" drives the real dual FR3
+      # (franka_hardware/FrankaHardwareInterface, connecting to the FCI IPs above).
+      - use_fake_hardware: "false"
+    simulated_hardware_launch_file:
+      package: "moveit_studio_agent"
+      path: "launch/blank.launch.py"
+
+# Configuration files for MoveIt.
+# For more information, refer to https://moveit.picknik.ai/main/doc/how_to_guides/moveit_configuration/moveit_configuration_tutorial.html
+# [Required]
+moveit_params:
+  # Used by the Waypoint Manager to save joint states from this joint group.
+  joint_group_name: "right_manipulator"
+
+  kinematics:
+    package: "franka_dual_arm_hw"
+    path: "config/moveit/pose_ik_distance.yaml"
+  sensors_3d:
+    package: "franka_dual_arm_hw"
+    path: "config/moveit/sensors_3d.yaml"
+  joint_limits:
+    package: "franka_dual_arm_hw"
+    path: "config/moveit/joint_limits.yaml"
+  pose_jog:
+    package: "franka_dual_arm_hw"
+    path: "config/moveit/pose_jog.yaml"
+  joint_jog:
+    package: "franka_dual_arm_hw"
+    path: "config/moveit/joint_jog.yaml"
+
+  publish:
+    planning_scene: True
+    geometry_updates: True
+    state_updates: True
+    transforms_updates: True
+
+  trajectory_execution:
+    manage_controllers: True
+    allowed_execution_duration_scaling: 2.0
+    allowed_goal_duration_margin: 5.0
+    allowed_start_tolerance: 0.01
+
+# Configuration for loading behaviors and objectives.
+# [Required]
+objectives:
+  # List of plugins for loading custom behaviors.
+  # [Required]
+  behavior_loader_plugins:
+    # This plugin will load the core MoveIt Pro Behaviors.
+    # Add additional plugin loaders as needed.
+    core:
+      - "moveit_pro::behaviors::CoreBehaviorsLoader"
+      - "moveit_pro::behaviors::MTCCoreBehaviorsLoader"
+      - "moveit_pro::behaviors::VisionBehaviorsLoader"
+      - "moveit_pro::behaviors::ConverterBehaviorsLoader"
+  # Specify source folder for objectives
+  # [Required]
+  objective_library_paths:
+    core_objectives:
+      package_name: "moveit_pro_objectives"
+      relative_path: "objectives/core"
+    motion_objectives:
+      package_name: "moveit_pro_objectives"
+      relative_path: "objectives/motion"
+    perception_objectives:
+      package_name: "moveit_pro_objectives"
+      relative_path: "objectives/perception"
+    custom_objectives:
+      package_name: "franka_dual_arm_hw"
+      relative_path: "objectives"
+  # Specify the location of the saved waypoints file.
+  # [Required]
+  waypoints_file:
+    package_name: "franka_dual_arm_hw"
+    relative_path: "waypoints/waypoints.yaml"
+# Configuration for launching ros2_control processes.
+# [Required, if using ros2_control]
+ros2_control:
+  config:
+    package: "franka_dual_arm_hw"
+    path: "config/control/franka_ros2_control.yaml"
+  # MoveIt Pro will load and activate these controllers at start up to ensure they are available.
+  # [Optional, default=[]]
+  controllers_active_at_startup:
+    - "joint_state_broadcaster"
+    - "joint_trajectory_controller"
+    # REAL HARDWARE ONLY: the franka robot-state broadcasters need the franka robot_state
+    # interface, which mock_components/GenericSystem does not provide. Comment these two
+    # out again when switching back to mock (simulated: True / use_fake_hardware: "true").
+    - "left_franka_robot_state_broadcaster"
+    - "right_franka_robot_state_broadcaster"
+  # Load but do not start these controllers so they can be activated later (e.g. by teleop
+  # switching from the combined JTC into per-arm jog controllers).
+  # [Optional, default=[]]
+  controllers_inactive_at_startup:
+    - "left_joint_velocity_controller"
+    - "right_joint_velocity_controller"
+    - "left_velocity_force_controller"
+    - "right_velocity_force_controller"
+    # UI shim controllers: loaded (so their parameter services exist for the teleop
+    # UI's hardcoded /joint_velocity_controller and /velocity_force_controller reads)
+    # but never activated. See config/control/franka_ros2_control.yaml for details.
+    - "joint_velocity_controller"
+    - "velocity_force_controller"
+  # Any controllers here will not be spawned by MoveIt Pro.
+  # [Optional, default=[]]
+  controllers_not_managed: []
+  # Optionally configure remapping rules to let multiple controllers receive commands on the same topic.
+  # [Optional, default=[]]
+  controller_shared_topics: []

@@ -1,0 +1,73 @@
+# Contains colcon default settings for user overlay containers.
+build:
+  # Enable this for bidirectional syncing from the UI
+  symlink-install: true
+  allow-overriding:
+    - robotiq_description
+    - ur_description
+  mixin:
+    # Enable ccache support
+    - ccache
+    # Multithreaded linker to speed up linking step during compilation
+    - lld
+    - compile-commands
+    # Debug info and build testing for dev workflows
+    - rel-with-deb-info
+    - build-testing-on
+    - coverage-gcc
+    - coverage-pytest
+    # Custom mixins (see mixin/disable-libfranka-tests.mixin,
+    # mixin/disable-libfranka-examples.mixin). Must stay LAST: each appends to
+    # cmake-args (-DBUILD_TESTS=OFF / -DBUILD_EXAMPLES=OFF) so they extend rather
+    # than replace. libfranka is the only package using BUILD_TESTS; its tests need
+    # GTest::gmock, which the container's system GTest config lacks, and we skip
+    # them at test time. libfranka's examples trigger a GCC 13 internal compiler
+    # error (ICE) on the Jazzy/Noble base image, so we disable them too.
+    - disable-libfranka-tests
+    - disable-libfranka-examples
+  packages-skip:
+    # franka_ros2 packages that are not Jazzy-ready and/or not needed for the
+    # FR3 arm/dual-arm hardware configs in this workspace. We build only
+    # franka_hardware, franka_gripper, franka_robot_state_broadcaster,
+    # franka_semantic_components and franka_msgs from the franka_ros2 submodule.
+    - franka_bringup
+    - franka_example_controllers
+    - franka_fr3_moveit_config
+    - franka_gazebo_bringup
+    - franka_ign_ros2_controls
+    - franka_mobile
+    - franka_mobile_fr3_duo_moveit_config
+    - franka_mobile_sensors
+    - mobile_fr3_duo_trajectory_controller
+    - franka_selfcollision
+    - franka_vision_and_manipulation_kit
+    - integration_launch_testing
+    # Pure metapackage that depends on the skipped franka_bringup / *_moveit_config /
+    # gazebo / example_controllers packages, so it can't build while those are skipped.
+    # Nothing in the workspace depends on it; concrete packages depend on the real ones.
+    - franka_ros2
+    # The single custom behavior this package provided (FrankaGraspAction) is no
+    # longer used: grasp_object.xml now calls the core MoveGripperAction via the
+    # "Close Gripper" objective. The package also fails to configure on Jazzy
+    # because its transitive moveit_pro_behavior -> moveit_pro_mpc -> PCL -> VTK 9.1
+    # chain references an MPI::MPI_C target that nothing defines. Skipped.
+    - franka_behaviors
+    - realtime_tools
+test:
+  event-handlers:
+    - console_direct+
+    - desktop_notification+
+  packages-skip:
+    - libfranka
+    - franka_bringup
+    - franka_example_controllers
+    - franka_fr3_moveit_config
+    - franka_gazebo_bringup
+    - franka_ign_ros2_control
+    - franka_gripper
+    - franka_hardware
+    - franka_robot_state_broadcaster
+    - franka_ros2
+    - franka_semantic_components
+    - franka_behaviors
+    - integration_launch_testing

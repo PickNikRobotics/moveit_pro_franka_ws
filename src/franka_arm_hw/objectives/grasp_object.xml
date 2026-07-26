@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Grasp Object">
+  <!--//////////-->
+  <BehaviorTree
+    ID="Grasp Object"
+    _description="Grasp an object by closing the gripper."
+    _favorite="true"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree ID="Close Gripper" _collapsed="true" />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Grasp Object">
+      <MetadataFields>
+        <Metadata subcategory="Grasping" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Right-arm gripper (dual-arm config). The right franka_gripper node runs in
+     the "right" namespace, so its action server is /right/franka_gripper/... -->
+<root BTCPP_format="4" main_tree_to_execute="Close Gripper">
+  <BehaviorTree ID="Close Gripper" _description="Close the right gripper">
+    <Control ID="Sequence" name="root">
+      <Action
+        ID="MoveGripperAction"
+        gripper_command_action_name="/right/franka_gripper/gripper_action"
+        position="0.009"
+        timeout="10.000000"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Close Gripper">
+      <MetadataFields>
+        <Metadata subcategory="Grasping" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>
