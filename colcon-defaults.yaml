@@ -52,6 +52,7 @@ build:
     # because its transitive moveit_pro_behavior -> moveit_pro_mpc -> PCL -> VTK 9.1
     # chain references an MPI::MPI_C target that nothing defines. Skipped.
     - franka_behaviors
+    - realtime_tools
 test:
   event-handlers:
     - console_direct+

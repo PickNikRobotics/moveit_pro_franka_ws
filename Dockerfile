@@ -134,10 +134,10 @@ RUN --mount=type=bind,target=/tmp/ws_src,source=./src \
       . "/opt/ros/${ros_distro}/setup.sh"; \
       . /opt/overlay_ws/install/setup.sh; \
       cd /tmp/mo_ws; \
-      colcon build --merge-install --install-base /tmp/mo_ws/install \
+      colcon build --install-base /tmp/mo_ws/install \
         --packages-select realtime_tools hardware_interface \
         --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF; \
-      for d in lib include share; do \
+      for d in realtime_tools hardware_interface; do \
         if [ -d "/tmp/mo_ws/install/${d}" ]; then cp -a "/tmp/mo_ws/install/${d}/." "/opt/overlay_ws/install/${d}/"; fi; \
       done; \
       cd /; rm -rf /tmp/mo_ws; \
