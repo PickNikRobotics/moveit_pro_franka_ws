@@ -1,0 +1,14 @@
+moveit_pro_franka_ws
+
+Unless otherwise noted, this repository is licensed under the BSD 3-Clause
+License in LICENSE.
+
+The following files are Copyright (c) 2025 Franka Robotics GmbH and are
+licensed under the Apache License, Version 2.0, reproduced in
+LICENSES/Apache-2.0.txt:
+
+- franka_dual_arm_hw/launch/left_franka.launch.py
+- franka_dual_arm_hw/launch/right_franka.launch.py
+- franka_dual_arm_hw/launch/robot_drivers_to_persist.launch.py
+
+Their existing copyright and license headers must be retained.
