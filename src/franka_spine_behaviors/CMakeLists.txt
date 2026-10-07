@@ -33,6 +33,8 @@ if(BUILD_TESTING)
   target_include_directories(test_spine_height PRIVATE include)
   ament_add_ros_isolated_gtest(test_behavior_plugins test/test_behavior_plugins.cpp)
   ament_target_dependencies(test_behavior_plugins ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  ament_add_ros_isolated_gtest(test_create_spine_state test/test_create_spine_state.cpp)
+  ament_target_dependencies(test_create_spine_state ${THIS_PACKAGE_INCLUDE_DEPENDS})
 endif()
 
 # Lets MoveIt Pro's Behavior loaders find FrankaSpineBehaviorsLoader.

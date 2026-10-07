@@ -146,7 +146,8 @@ BT::NodeStatus GetSpineStateForPoseHeight::tick()
                                            pose_in_parent.pose.position.z + bias, min_value, max_value);
 
   moveit_msgs::msg::RobotState spine_state;
-  spine_state.is_diff = true;
+  // A complete state holding only the spine joint, as PlanToJointGoal requires.
+  spine_state.is_diff = false;
   spine_state.joint_state.name = { joint_name };
   spine_state.joint_state.position = { value };
   setOutput(kPortSpineJointState, spine_state);
