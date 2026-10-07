@@ -1,6 +1,6 @@
 
 runtime_launch_file:
-  package: "fr3_duo_mock"
+  package: "fr3_duo_spine_mock"
   path: "launch/runtime.launch.xml"
 
 hardware:
@@ -8,10 +8,10 @@ hardware:
   launch_robot_state_publisher: true
   robot_description:
     urdf:
-      package: "fr3_duo_mock"
+      package: "fr3_duo_spine_mock"
       path: "description/fr3_duo.urdf.xacro"
     srdf:
-      package: "fr3_duo_mock"
+      package: "fr3_duo_spine_mock"
       path: "config/moveit/fr3_duo.srdf"
     urdf_params:
       - hardware_interface: "mock"
@@ -19,16 +19,16 @@ hardware:
 moveit_params:
   joint_group_name: "manipulator"
   kinematics:
-    package: "fr3_duo_mock"
+    package: "fr3_duo_spine_mock"
     path: "config/moveit/pose_ik.yaml"
   joint_limits:
-    package: "fr3_duo_mock"
+    package: "fr3_duo_spine_mock"
     path: "config/moveit/joint_limits.yaml"
   joint_jog:
-    package: "fr3_duo_mock"
+    package: "fr3_duo_spine_mock"
     path: "config/moveit/joint_jog.yaml"
   pose_jog:
-    package: "fr3_duo_mock"
+    package: "fr3_duo_spine_mock"
     path: "config/moveit/pose_jog.yaml"
   publish:
     planning_scene: true
@@ -38,7 +38,7 @@ moveit_params:
 
 ros2_control:
   config:
-    package: "fr3_duo_mock"
+    package: "fr3_duo_spine_mock"
     path: "config/control/fr3_duo.ros2_control.yaml"
   controllers_active_at_startup:
     - "joint_state_broadcaster"
@@ -81,9 +81,9 @@ objectives:
     visualization_objectives:
       package_name: "moveit_pro_objectives"
       relative_path: "objectives/visualization"
-    fr3_duo_mock_objectives:
-      package_name: "fr3_duo_mock"
+    fr3_duo_spine_mock_objectives:
+      package_name: "fr3_duo_spine_mock"
       relative_path: "objectives"
   waypoints_file:
-    package_name: "fr3_duo_mock"
+    package_name: "fr3_duo_spine_mock"
     relative_path: "waypoints/waypoints.yaml"

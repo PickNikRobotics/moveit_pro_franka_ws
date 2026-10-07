@@ -1,6 +1,6 @@
-# Everything not set here comes from fr3_duo_mock: description, SRDF, MoveIt
+# Everything not set here comes from fr3_duo_spine_mock: description, SRDF, MoveIt
 # parameters, controllers, Objectives (including the MuJoCo ones) and waypoints.
-based_on_package: fr3_duo_mock
+based_on_package: fr3_duo_spine_mock
 
 hardware:
   robot_description:

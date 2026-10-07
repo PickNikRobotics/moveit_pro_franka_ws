@@ -10,15 +10,15 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | --- | --- | --- |
 | [`fr3_solo_mock`](src/fr3_solo_mock) | One FR3 arm with a Franka Hand | mock hardware |
 | [`fr3_solo_sim`](src/fr3_solo_sim) | One FR3 arm with a Franka Hand | MuJoCo, robot only |
-| [`fr3_duo_mock`](src/fr3_duo_mock) | FR3 Duo on a fixed pedestal and spine: two FR3 v2 arms, two Franka Hands | mock hardware |
-| [`fr3_duo_sim`](src/fr3_duo_sim) | FR3 Duo on a fixed pedestal and spine | MuJoCo, robot only |
+| [`fr3_duo_spine_mock`](src/fr3_duo_spine_mock) | FR3 Duo on a fixed pedestal and spine: two FR3 v2 arms, two Franka Hands | mock hardware |
+| [`fr3_duo_spine_sim`](src/fr3_duo_spine_sim) | FR3 Duo on a fixed pedestal and spine | MuJoCo, robot only |
 | [`mobile_fr3_duo_mock`](src/mobile_fr3_duo_mock) | Mobile FR3 Duo: TMR v0.2 swerve base, spine, two FR3 v2 arms, two Franka Hands | mock hardware |
 | [`mobile_fr3_duo_sim`](src/mobile_fr3_duo_sim) | Mobile FR3 Duo | MuJoCo, with a room scene, lidars and Nav2 |
 | [`franka_behaviors`](src/franka_behaviors) | Franka-specific Behaviors (grasp, collision thresholds) | excluded from the build |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
 
 Each `_sim` package inherits from its `_mock` package (`based_on_package`).
-`fr3_solo_sim` and `fr3_duo_sim` change only the hardware; `mobile_fr3_duo_sim` also replaces the controllers and adds Nav2 (see its README).
+`fr3_solo_sim` and `fr3_duo_spine_sim` change only the hardware; `mobile_fr3_duo_sim` also replaces the controllers and adds Nav2 (see its README).
 Real-hardware (`_hw`) configurations are not part of this workspace yet; they return in a later change.
 
 ## Getting started

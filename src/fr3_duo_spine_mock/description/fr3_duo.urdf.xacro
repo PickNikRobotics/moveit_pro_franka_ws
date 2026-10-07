@@ -79,12 +79,12 @@
   </joint>
 
   <xacro:if value="${'$(arg hardware_interface)' == 'mock'}">
-    <xacro:include filename="$(find fr3_duo_mock)/description/fr3_duo_mock.ros2_control.xacro"/>
-    <xacro:fr3_duo_mock_ros2_control/>
+    <xacro:include filename="$(find fr3_duo_spine_mock)/description/fr3_duo_spine_mock.ros2_control.xacro"/>
+    <xacro:fr3_duo_spine_mock_ros2_control/>
   </xacro:if>
 
   <xacro:if value="${'$(arg hardware_interface)' == 'mujoco'}">
-    <xacro:include filename="$(find fr3_duo_sim)/description/fr3_duo_mujoco.ros2_control.xacro"/>
+    <xacro:include filename="$(find fr3_duo_spine_sim)/description/fr3_duo_mujoco.ros2_control.xacro"/>
     <xacro:fr3_duo_mujoco_ros2_control mujoco_model="$(arg mujoco_model)" mujoco_viewer="$(arg mujoco_viewer)"/>
   </xacro:if>
 </robot>

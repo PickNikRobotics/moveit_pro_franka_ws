@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <package format="3">
-  <name>fr3_duo_mock</name>
+  <name>fr3_duo_spine_mock</name>
   <version>10.1.0</version>
   <description>
     MoveIt Pro configuration for the Franka FR3 Duo on a fixed pedestal and spine, on mock hardware.

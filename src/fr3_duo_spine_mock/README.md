@@ -1,4 +1,4 @@
-# fr3_duo_mock
+# fr3_duo_spine_mock
 
 MoveIt Pro configuration for the Franka FR3 Duo on a fixed base: a pedestal, the vertical spine, the Duo mount with the head, two FR3 v2 arms and two Franka Hands.
 It is the Mobile FR3 Duo (`mobile_fr3_duo_mock`) without the TMR mobile base, so the two configurations share joint names, planning groups and controller names.
@@ -11,7 +11,7 @@ The pedestal is a plain box whose height is the spine mounting height in franka_
 ```bash
 git submodule update --init
 moveit_pro build
-moveit_pro run -c fr3_duo_mock
+moveit_pro run -c fr3_duo_spine_mock
 ```
 
 ## Layout
