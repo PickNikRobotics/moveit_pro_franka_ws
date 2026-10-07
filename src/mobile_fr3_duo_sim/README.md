@@ -4,7 +4,7 @@ MoveIt Pro MuJoCo simulation configuration for the Franka Mobile FR3 Duo, with f
 
 The scene is a 12 m by 12 m room with a narrow passage, obstacles, a table and two scene cameras. The table stands within the arms' reach in front of the robot and is not in MoveIt's planning scene, so plan arm motions that keep clear of it. Nav2 runs on a map of that room (`maps/room.yaml`, made with slam_toolbox), and the "Navigate to Clicked Point" Objective drives the base there.
 
-It inherits everything from `mobile_fr3_duo_mock` (robot description, SRDF, MoveIt parameters, Objectives and waypoints) and replaces only the hardware and the controllers.
+It inherits everything from `mobile_fr3_duo_mock` (robot description, SRDF, MoveIt parameters, Objectives and waypoints) and replaces the hardware, the controllers, the Behavior loaders (to add the Nav2 Behaviors) and the "Move Base to Ready" Objective.
 
 ## Frames and odometry
 
@@ -35,6 +35,7 @@ A child configuration can override these through `urdf_params`; the defaults are
 ## Build and run
 
 ```bash
+git lfs pull
 git submodule update --init
 moveit_pro build
 moveit_pro run -c mobile_fr3_duo_sim
@@ -48,11 +49,11 @@ moveit_pro run -c mobile_fr3_duo_sim
 | `config/control/` | ros2_control controllers for the simulation |
 | `description/` | MuJoCo ros2_control hardware macro |
 | `mjcf/` | MuJoCo scene and robot model |
-| `mjcf/assets/` | meshes and the conversion input URDF |
+| `mjcf/assets/` | meshes, and `robot_description.urdf`, the original conversion input for the MuJoCo model; it predates the `odom` root, is not loaded at run time, and must not be used to regenerate the MJCF until you re-root it at `odom` |
 | `launch/`, `script/` | frames, lidar flattening, scan merging, the odometry bridge, the `cmd_vel` bridge, Nav2 bring-up |
 | `test/` | tests for the odometry and `cmd_vel` bridges |
 | `maps/`, `params/` | room map, Nav2 and slam_toolbox parameters |
-| `objectives/` | Navigate to Clicked Point |
+| `objectives/` | Navigate to Clicked Point, Move Base to Ready |
 
 ## Third-party assets
 

@@ -14,7 +14,7 @@
     </joint>
   </xacro:macro>
 
-  <!-- Arm command limits come from franka_description, so they track its joint limits. -->
+  <!-- Limits from franka_description, informational only: MujocoSystem builds its interfaces and limits from the MJCF. -->
   <xacro:property name="fr3_solo_joint_limits" value="${xacro.load_yaml('$(find franka_description)/robots/fr3/joint_limits.yaml')}" />
   <xacro:property name="fr3_solo_ready_pose" value="${[0.0, -pi/4, 0.0, -3*pi/4, 0.0, pi/2, pi/4]}" />
   <xacro:macro name="fr3_solo_mujoco_arm_joint" params="index">

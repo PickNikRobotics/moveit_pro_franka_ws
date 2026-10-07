@@ -17,12 +17,16 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | [`franka_behaviors`](src/franka_behaviors) | Franka-specific Behaviors (grasp, collision thresholds) | excluded from the build |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
 
-Each `_sim` package inherits from its `_mock` package (`based_on_package`) and changes only the hardware.
+Each `_sim` package inherits from its `_mock` package (`based_on_package`).
+`fr3_solo_sim` and `fr3_duo_sim` change only the hardware; `mobile_fr3_duo_sim` also replaces the controllers and adds Nav2 (see its README).
 Real-hardware (`_hw`) configurations are not part of this workspace yet; they return in a later change.
 
 ## Getting started
 
+The MuJoCo meshes and the Nav2 map are stored in Git LFS, so install [git-lfs](https://git-lfs.com) before you clone.
+
 ```bash
+git lfs install
 git clone --recurse-submodules https://github.com/PickNikRobotics/moveit_pro_franka_ws.git
 cd moveit_pro_franka_ws
 moveit_pro configure -w "$(pwd)"
@@ -32,6 +36,7 @@ moveit_pro run -c fr3_solo_sim
 
 Use `-c` with any configuration package from the table, for example `-c mobile_fr3_duo_sim`.
 If you cloned without `--recurse-submodules`, run `git submodule update --init` first.
+If you cloned without git-lfs, run `git lfs install` and `git lfs pull` first.
 
 ## Controller names
 

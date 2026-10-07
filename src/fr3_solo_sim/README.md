@@ -8,6 +8,7 @@ It inherits everything from `fr3_solo_mock` (robot description, SRDF, MoveIt par
 ## Build and run
 
 ```bash
+git lfs pull
 git submodule update --init
 moveit_pro build
 moveit_pro run -c fr3_solo_sim
