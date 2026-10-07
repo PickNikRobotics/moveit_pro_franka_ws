@@ -82,6 +82,7 @@ objectives:
       - "moveit_pro::behaviors::MTCCoreBehaviorsLoader"
       - "moveit_pro::behaviors::VisionBehaviorsLoader"
       - "moveit_pro::behaviors::ConverterBehaviorsLoader"
+      - "moveit_pro::behaviors::MujocoBehaviorsLoader"
   # Specify source folder for objectives
   # [Required]
   objective_library_paths:
@@ -97,6 +98,10 @@ objectives:
     visualization_objectives:
       package_name: "moveit_pro_objectives"
       relative_path: "objectives/visualization"
+    mujoco_objectives:
+      package_name: "moveit_pro_objectives"
+      relative_path: "objectives/mujoco"
+    # Listed last: Objectives saved from the UI land in this package, also when running fr3_solo_sim.
     fr3_solo_mock_objectives:
       package_name: "fr3_solo_mock"
       relative_path: "objectives"

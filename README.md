@@ -2,7 +2,7 @@
 
 [MoveIt Pro](https://docs.picknik.ai) configuration packages for [Franka Robotics](https://franka.de) robots: the Franka Research 3 (FR3) arm, the FR3 Duo and the Mobile FR3 Duo.
 
-This is a MoveIt Pro **10.2+ / ROS 2 Jazzy** workspace.
+This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 
 ## Packages
 

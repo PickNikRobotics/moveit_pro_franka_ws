@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <package format="3">
   <name>mobile_fr3_duo_sim</name>
-  <version>10.2.0</version>
+  <version>10.1.0</version>
   <description>
     MoveIt Pro simulation configuration for the Franka Mobile FR3 Duo.
   </description>

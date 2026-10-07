@@ -1,6 +1,6 @@
 # Project agent memory
 
-MoveIt Pro 10.2+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md` lists the packages.
+MoveIt Pro 10.1.0+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md` lists the packages.
 
 ## Layout and inheritance
 

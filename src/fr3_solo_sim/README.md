@@ -17,7 +17,7 @@ moveit_pro run -c fr3_solo_sim
 
 | Path | Contents |
 | --- | --- |
-| `config/config.yaml` | inheritance from `fr3_solo_mock`, MuJoCo xacro arguments, MuJoCo Behaviors and Objectives |
+| `config/config.yaml` | inheritance from `fr3_solo_mock` and the MuJoCo xacro arguments |
 | `description/` | MuJoCo ros2_control hardware macro |
 | `mjcf/scene.xml` | scene: floor, light and the `default` keyframe (the "ready" arm pose) |
 | `mjcf/fr3_solo.xml`, `mjcf/assets/` | FR3 and Franka Hand model and meshes |
