@@ -12,12 +12,12 @@ controller_manager:
       type: joint_trajectory_controller/JointTrajectoryController
     spine_jvc:
       type: joint_velocity_controller/JointVelocityController
-    base_jtc:
-      type: joint_trajectory_controller/JointTrajectoryController
     base_jvc:
       type: joint_velocity_controller/JointVelocityController
     base_vfc:
       type: velocity_force_controller/VelocityForceController
+    base_jgvc:
+      type: velocity_controllers/JointGroupVelocityController
     joint_trajectory_admittance_controller:
       type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
     left_jtac_w_spine:
@@ -61,21 +61,11 @@ spine_jvc:
     max_joint_velocity: [0.1]
     max_joint_acceleration: [0.5]
 
-base_jtc:
-  ros__parameters:
-    joints:
-      - planar_x
-      - planar_y
-      - planar_theta
-    command_interfaces:
-      - position
-    state_interfaces:
-      - position
-      - velocity
-
 base_jvc:
   ros__parameters:
     planning_group_name: mobile_base
+    command_interfaces:
+      - velocity
     max_joint_velocity: [0.35, 0.35, 0.5]
     max_joint_acceleration: [0.4, 0.4, 0.3]
 
@@ -86,11 +76,20 @@ base_vfc:
     planning_group_name: mobile_base
     ee_frame: base_link
     sensor_frame: base_link
-    command_interfaces: ["position"]
+    command_interfaces: ["velocity"]
     max_joint_velocity: [0.35, 0.35, 0.5]
     max_joint_acceleration: [0.4, 0.4, 0.3]
     max_cartesian_velocity: [0.35, 0.35, 0.35, 0.5, 0.5, 0.5]
     max_cartesian_acceleration: [0.4, 0.4, 0.4, 0.3, 0.3, 0.3]
+
+# Nav2 drives the base through this controller: base_twist_to_planar turns /cmd_vel into world-axis
+# planar joint velocities. The base jog controllers use the same velocity interfaces.
+base_jgvc:
+  ros__parameters:
+    joints:
+      - planar_x
+      - planar_y
+      - planar_theta
 
 joint_trajectory_admittance_controller:
   ros__parameters:
