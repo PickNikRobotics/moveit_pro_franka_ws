@@ -34,6 +34,8 @@
         <param name="mujoco_model_package">fr3_solo_sim</param>
         <param name="mujoco_viewer">${mujoco_viewer}</param>
         <param name="mujoco_keyframe">default</param>
+        <!-- Required by MujocoSystem; the scene has no cameras, so nothing is rendered. -->
+        <param name="render_publish_rate">10</param>
         <param name="tf_publish_rate">60</param>
       </hardware>
 
