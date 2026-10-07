@@ -22,6 +22,10 @@ MoveIt Pro 10.1.0+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md`
 - Meshes, images and the Nav2 map are stored in Git LFS, by the rules in `.gitattributes`. Install git-lfs (`git lfs install`) before you clone: without it, a checkout holds only pointer files that MuJoCo and Nav2 cannot load, and a new mesh is committed as a plain file.
 - Every MuJoCo keyframe `qpos` must have exactly `nq` values. Give `ctrl` too, matching `qpos` for position actuators, or a reset drives those joints to 0. Every Objective needs a `MetadataFields` block. Never put `--` inside an XML comment.
 
+## Known issues
+
+- Nav2 Jazzy (the 1.3.x in the MoveIt Pro image) can leave the base driving after a failed navigation. If the controller server acknowledges a new path-following goal later than the navigator's `default_server_timeout`, the navigator drops that goal without cancelling it and aborts the navigation. The controller keeps driving the base along the old path, with no Objective running, until the next navigation goal replaces it. Heavy CPU load makes it more likely. Upstream: Nav2 issue #6370, fixed on Nav2 main (#6373, #6445), not on Jazzy. The larger `default_server_timeout` in `mobile_fr3_duo_mock/params/nav2_params.yaml` makes it rarer but does not remove it; the remaining mitigation would be a node that cancels a `follow_path` goal still executing while no `navigate_to_pose` goal is active.
+
 ## Checking changes without a robot
 
 Build and load every config inside a MoveIt Pro image. Mount the workspace and the franka_description checkout. Run `colcon build` with an out-of-tree `--build-base`/`--install-base`, then construct `moveit_studio_utils_py.system_config.SystemConfigParser()` with `MOVEIT_CONFIG_PACKAGE=<package>` and `USER_WS` set. This runs the real config merge, schema checks and URDF/SRDF xacro. Source `/opt/overlay_ws/install/setup.bash` and use `--entrypoint bash`.
