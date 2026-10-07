@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="mobile_fr3_duo_mujoco_ros2_control" params="mujoco_model mujoco_viewer">
+    <ros2_control name="mobile_fr3_duo" type="system">
+      <sensor name="lidar_front">
+        <param name="points_topic">/lidar_front/points</param>
+      </sensor>
+      <sensor name="lidar_rear">
+        <param name="points_topic">/lidar_rear/points</param>
+      </sensor>
+      <hardware>
+        <plugin>picknik_mujoco_ros/MujocoSystem</plugin>
+        <param name="mujoco_model">${mujoco_model}</param>
+        <param name="mujoco_model_package">mobile_fr3_duo_sim</param>
+        <param name="mujoco_viewer">${mujoco_viewer}</param>
+        <param name="mujoco_keyframe">default</param>
+        <param name="render_publish_rate">10</param>
+        <param name="point_cloud_publish_rate">10</param>
+        <param name="tf_publish_rate">60</param>
+        <param name="lidar_publish_rate">10</param>
+        <!-- mj_world -> map -> odom -> world come from static transforms in
+             launch/additional_driver_nodes.launch.py, so the plugin must not parent world. -->
+        <param name="publish_mj_world_tf">false</param>
+        <!-- /odom for Nav2 (ground truth). No TF: robot_state_publisher owns the chain to base_link. -->
+        <param name="publish_odom">true</param>
+        <!-- Raw: the plugin reports the twist in the odom frame. odom_twist_to_base.py
+             rotates it into base_link and republishes /odom. -->
+        <param name="odom_topic">/mujoco/odom</param>
+        <param name="odom_frame">odom</param>
+        <param name="odom_child_frame">base_link</param>
+        <param name="odom_rate">50</param>
+        <param name="odom_planar">true</param>
+        <param name="odom_publish_tf">false</param>
+      </hardware>
+    </ros2_control>
+  </xacro:macro>
+</robot>
