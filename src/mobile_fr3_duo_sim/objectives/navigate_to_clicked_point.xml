@@ -8,11 +8,7 @@
   >
     <Control ID="Sequence" name="TopLevelSequence">
       <Action ID="SetInitialPose" robot_frame_id="base_link" />
-      <Action
-        ID="SwitchController"
-        activate_controllers="base_jgvc"
-        deactivate_controllers="base_jtc"
-      />
+      <Action ID="SwitchController" activate_controllers="base_jgvc" />
       <Action
         ID="GetPoseFromUser"
         is_normal="true"
@@ -26,11 +22,6 @@
         behavior_tree_path="/opt/ros/jazzy/share/nav2_bt_navigator/behavior_trees/navigate_to_pose_w_replanning_and_recovery.xml"
         ignore_stamp_time="true"
         pose_stamped="{goal}"
-      />
-      <Action
-        ID="SwitchController"
-        activate_controllers="base_jtc"
-        deactivate_controllers="base_jgvc"
       />
     </Control>
   </BehaviorTree>

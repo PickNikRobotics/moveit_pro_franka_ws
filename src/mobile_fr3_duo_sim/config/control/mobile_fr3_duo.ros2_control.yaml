@@ -12,10 +12,10 @@ controller_manager:
       type: position_controllers/GripperActionController
     spine_jtc:
       type: joint_trajectory_controller/JointTrajectoryController
-    base_jtc:
-      type: joint_trajectory_controller/JointTrajectoryController
     base_jvc:
       type: joint_velocity_controller/JointVelocityController
+    base_vfc:
+      type: velocity_force_controller/VelocityForceController
     base_jgvc:
       type: velocity_controllers/JointGroupVelocityController
     joint_trajectory_admittance_controller:
@@ -106,28 +106,6 @@ spine_jtc:
       franka_spine_vertical_joint:
         goal: 0.01
 
-base_jtc:
-  ros__parameters:
-    joints:
-      - planar_x
-      - planar_y
-      - planar_theta
-    command_interfaces:
-      - velocity
-    state_interfaces:
-      - position
-      - velocity
-    # Planar joint gains from hangar_sim
-    gains:
-      planar_x:
-        p: 2.0
-        ff_velocity_scale: 1.0
-      planar_y:
-        p: 2.0
-        ff_velocity_scale: 1.0
-      planar_theta:
-        p: 2.0
-        ff_velocity_scale: 1.0
 
 base_jvc:
   ros__parameters:
@@ -136,6 +114,19 @@ base_jvc:
       - velocity
     max_joint_velocity: [0.35, 0.35, 0.5]
     max_joint_acceleration: [0.4, 0.4, 0.3]
+
+# Pose jog of the base (mobile_base group): Cartesian twists of base_link. The base is holonomic,
+# so x, y and yaw are reachable; the other directions have no joint and stay at zero.
+base_vfc:
+  ros__parameters:
+    planning_group_name: mobile_base
+    ee_frame: base_link
+    sensor_frame: base_link
+    command_interfaces: ["velocity"]  # the MuJoCo planar actuators take velocity
+    max_joint_velocity: [0.35, 0.35, 0.5]
+    max_joint_acceleration: [0.4, 0.4, 0.3]
+    max_cartesian_velocity: [0.35, 0.35, 0.35, 0.5, 0.5, 0.5]
+    max_cartesian_acceleration: [0.4, 0.4, 0.4, 0.3, 0.3, 0.3]
 
 base_jgvc:
   ros__parameters:

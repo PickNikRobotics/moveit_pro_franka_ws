@@ -15,7 +15,7 @@ It inherits everything from `mobile_fr3_duo_mock` (robot description, SRDF, Move
 - `joint_state_broadcaster` lists every joint except the planar ones (`config/control/`), so the true planar values never reach `/joint_states`.
 - `script/base_twist_to_planar.py` turns Nav2's `/cmd_vel` into planar joint velocities for `base_jgvc`, using the true heading.
 
-With drift on, base trajectory moves through `base_jtc` land off by the drift accumulated so far: MoveIt plans them in the drifted `odom` frame, and the controller drives the true joints. Nav2 moves do not, because AMCL corrects `map` -> `odom`.
+This package has no base trajectory controller. With drift on, a planned base trajectory would land off by the drift accumulated so far: MoveIt plans it in the drifted `odom` frame, and the controller drives the true joints. So the base moves through Nav2 (`base_jgvc`, active at startup; AMCL corrects `map` -> `odom`) and through teleop on the `mobile_base` group: joint jog (`base_jvc`) and pose jog of `base_link` (`base_vfc`). The jog controllers read the simulator's true planar joints, so a pose jog in `base_link` moves the base along its true body axes. "Move Base to Ready" drives to the map origin with Nav2 here, replacing the mock's trajectory version. `mobile_fr3_duo_mock`, which has no drift, keeps `base_jtc`.
 
 ## MuJoCo xacro arguments
 

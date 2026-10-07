@@ -19,7 +19,7 @@ ros2_control:
     - "imu_sensor_broadcaster"
     - "left_gripper_controller"
     - "right_gripper_controller"
-    - "base_jtc"
+    - "base_jgvc"
     - "joint_trajectory_admittance_controller"
   controllers_inactive_at_startup:
     - "spine_jtc"
@@ -32,7 +32,7 @@ ros2_control:
     - "right_vfc"
     - "right_jvc"
     - "base_jvc"
-    - "base_jgvc"
+    - "base_vfc"
 
 objectives:
   # The base config's loaders plus the Nav2 Behaviors (NavigateToPose,

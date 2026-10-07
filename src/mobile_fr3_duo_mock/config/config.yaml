@@ -61,6 +61,7 @@ ros2_control:
     - "right_vfc"
     - "right_jvc"
     - "base_jvc"
+    - "base_vfc"
 
 objectives:
   behavior_loader_plugins:

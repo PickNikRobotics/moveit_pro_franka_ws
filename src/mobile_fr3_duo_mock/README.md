@@ -10,6 +10,10 @@ This configuration runs on mock hardware (`mock_components/GenericSystem`), with
 
 The URDF starts at `odom`. `launch/frames.launch.py` publishes `world` -> `map` and `map` -> `odom` as fixed identities, because mock hardware has no localization. The planar joints are the base pose in `odom`; `base_jtc` moves them.
 
+## Base teleoperation
+
+The base is holonomic (a swerve drive), so it can move sideways. The `mobile_base` planning group holds only the planar joints, and the teleop jogs it like an arm: joint jog through `base_jvc` and pose jog of `base_link` through `base_vfc` (`config/moveit/joint_jog.yaml`, `pose_jog.yaml`).
+
 ## Requirements
 
 The robot description comes from the `franka_description` submodule:
@@ -52,3 +56,4 @@ The whole upper body (`manipulator`: spine and both arms) keeps the standard con
 | `left_jvc`, `right_jvc` | `joint_velocity_controller/JointVelocityController` | `left_manipulator_without_spine`, `right_manipulator_without_spine` | inactive |
 | `spine_jtc` | `joint_trajectory_controller/JointTrajectoryController` | `spine` | inactive |
 | `base_jvc` | `joint_velocity_controller/JointVelocityController` | `mobile_base` | inactive |
+| `base_vfc` | `velocity_force_controller/VelocityForceController` | `mobile_base` | inactive |
