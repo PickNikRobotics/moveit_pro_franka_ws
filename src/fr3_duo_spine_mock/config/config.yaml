@@ -67,8 +67,8 @@ objectives:
       - "moveit_pro::behaviors::ConverterBehaviorsLoader"
       - "moveit_pro::behaviors::MujocoBehaviorsLoader"
     # CreateSpineState and GetSpineStateForPoseHeight, for the spine Objectives.
-    spine:
-      - "franka_spine_behaviors::FrankaSpineBehaviorsLoader"
+    franka:
+      - "franka_behaviors::FrankaBehaviorsLoader"
   objective_library_paths:
     core_objectives:
       package_name: "moveit_pro_objectives"

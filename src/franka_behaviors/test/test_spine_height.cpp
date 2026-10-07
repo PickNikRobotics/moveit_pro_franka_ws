@@ -26,24 +26,25 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <gtest/gtest.h>
 
-#include <algorithm>
+#include <franka_behaviors/spine_height.hpp>
 
-namespace franka_spine_behaviors
+using franka_behaviors::spineValueForHeight;
+
+TEST(SpineHeight, MovesByTheHeightDifference)
 {
-/**
- * @brief Spine joint value that puts the spine link at a target height, clamped to the travel.
- * @param current_value The spine joint value now (meters).
- * @param current_link_height The spine link height now, along the joint axis (meters).
- * @param target_height The height the spine link should reach, in the same frame (meters).
- * @param min_value Lower end of the spine travel (meters).
- * @param max_value Upper end of the spine travel (meters).
- * @return The joint value, within [min_value, max_value].
- */
-inline double spineValueForHeight(double current_value, double current_link_height, double target_height,
-                                  double min_value, double max_value)
-{
-  return std::clamp(current_value + (target_height - current_link_height), min_value, max_value);
+  EXPECT_DOUBLE_EQ(spineValueForHeight(0.2, 0.3, 0.5, 0.0, 0.85), 0.4);
+  EXPECT_DOUBLE_EQ(spineValueForHeight(0.4, 0.5, 0.3, 0.0, 0.85), 0.2);
 }
-}  // namespace franka_spine_behaviors
+
+TEST(SpineHeight, StaysWhenAlreadyAtHeight)
+{
+  EXPECT_DOUBLE_EQ(spineValueForHeight(0.25, 0.35, 0.35, 0.0, 0.85), 0.25);
+}
+
+TEST(SpineHeight, ClampsToTheTravel)
+{
+  EXPECT_DOUBLE_EQ(spineValueForHeight(0.5, 0.6, 2.0, 0.0, 0.85), 0.85);
+  EXPECT_DOUBLE_EQ(spineValueForHeight(0.1, 0.2, -1.0, 0.0, 0.85), 0.0);
+}

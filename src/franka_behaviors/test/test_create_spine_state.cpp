@@ -29,29 +29,56 @@
 #include <gtest/gtest.h>
 
 #include <behaviortree_cpp/bt_factory.h>
+#include <moveit_msgs/msg/robot_state.hpp>
 #include <moveit_pro_behavior_interface/shared_resources_node_loader.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/node.hpp>
 
-// The loader must register every Behavior, and the factory must build each one.
-TEST(BehaviorTests, LoadBehaviorPlugins)
+#include <string>
+
+namespace
+{
+// Runs a one-node tree with CreateSpineState at the given position and returns its status.
+BT::NodeStatus runCreateSpineState(const std::string& position, moveit_msgs::msg::RobotState& out)
 {
   pluginlib::ClassLoader<moveit_pro::behaviors::SharedResourcesNodeLoaderBase> class_loader(
       "moveit_pro_behavior_interface", "moveit_pro::behaviors::SharedResourcesNodeLoaderBase");
-
-  auto node = std::make_shared<rclcpp::Node>("BehaviorTests");
+  auto node = std::make_shared<rclcpp::Node>("CreateSpineStateTest");
   auto shared_resources = std::make_shared<moveit_pro::behaviors::BehaviorContext>(node);
-
   BT::BehaviorTreeFactory factory;
-  {
-    auto plugin_instance = class_loader.createUniqueInstance("franka_spine_behaviors::FrankaSpineBehaviorsLoader");
-    ASSERT_NO_THROW(plugin_instance->registerBehaviors(factory, shared_resources));
-  }
+  auto loader = class_loader.createUniqueInstance("franka_behaviors::FrankaBehaviorsLoader");
+  loader->registerBehaviors(factory, shared_resources);
 
-  for (const auto* id : { "CreateSpineState", "GetSpineStateForPoseHeight" })
+  const std::string xml = R"(<root BTCPP_format="4" main_tree_to_execute="T"><BehaviorTree ID="T">
+      <Action ID="CreateSpineState" position=")" +
+                          position + R"(" spine_joint_state="{spine}" /></BehaviorTree></root>)";
+  auto tree = factory.createTreeFromText(xml);
+  const auto status = tree.tickWhileRunning();
+  if (status == BT::NodeStatus::SUCCESS)
   {
-    EXPECT_NO_THROW((void)factory.instantiateTreeNode("test_behavior_name", id, BT::NodeConfiguration())) << id;
+    out = tree.rootBlackboard()->get<moveit_msgs::msg::RobotState>("spine");
   }
+  return status;
+}
+}  // namespace
+
+// PlanToJointGoal rejects a diff, so the goal must be a complete state holding only the spine joint.
+TEST(CreateSpineState, OutputsACompleteSpineOnlyState)
+{
+  moveit_msgs::msg::RobotState state;
+  ASSERT_EQ(runCreateSpineState("0.3", state), BT::NodeStatus::SUCCESS);
+  EXPECT_FALSE(state.is_diff);
+  ASSERT_EQ(state.joint_state.name.size(), 1u);
+  EXPECT_EQ(state.joint_state.name[0], "franka_spine_vertical_joint");
+  ASSERT_EQ(state.joint_state.position.size(), 1u);
+  EXPECT_DOUBLE_EQ(state.joint_state.position[0], 0.3);
+}
+
+TEST(CreateSpineState, FailsOutsideTheTravel)
+{
+  moveit_msgs::msg::RobotState state;
+  EXPECT_EQ(runCreateSpineState("0.9", state), BT::NodeStatus::FAILURE);
+  EXPECT_EQ(runCreateSpineState("-0.1", state), BT::NodeStatus::FAILURE);
 }
 
 int main(int argc, char** argv)

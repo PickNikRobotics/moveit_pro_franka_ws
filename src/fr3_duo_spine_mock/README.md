@@ -16,7 +16,7 @@ The spine joint (`franka_spine_vertical_joint`, group `spine`) moves through:
 
 Both Objectives run `spine_jtc` and leave the arms where they are. Their ports follow the real spine's `MoveAbsolute` action (position, velocity, acceleration, deceleration, timeout, action name), so callers stay the same on real hardware. Mock and sim ignore everything but the position. Real hardware has no ros2_control interface for the spine: it will need its own versions of these Objectives, with a Behavior that calls Franka's spine `MoveAbsolute` action. That is not part of this workspace yet.
 
-The Behaviors `CreateSpineState` and `GetSpineStateForPoseHeight` come from `franka_spine_behaviors`.
+The Behaviors `CreateSpineState` and `GetSpineStateForPoseHeight` come from `franka_behaviors`.
 
 ## Build and run
 
