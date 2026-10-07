@@ -28,6 +28,8 @@ Every navigation Objective first runs the subtree **"Stow Arms for Navigation"**
 
 The base is holonomic (a swerve drive), so it can move sideways. The `mobile_base` planning group holds only the planar joints, and the teleop jogs it like an arm: joint jog through `base_jvc` and pose jog of `base_link` through `base_vfc` (`config/moveit/joint_jog.yaml`, `pose_jog.yaml`). All base controllers command velocity, so a jog takes the base from `base_jgvc`, and the navigation Objectives give it back.
 
+The base also has a teleop iMarker: `base_link` is the end effector of `mobile_base` (SRDF), and PoseIK solves `mobile_base` (`config/moveit/pose_ik.yaml`). Drag it in x, y or yaw and release: the arms stow and Nav2 drives the base to the marker, within Nav2's goal tolerance. z, roll and pitch drags have no IK solution, so the UI does not run them. This comes from `objectives/request_teleoperation.xml`, a copy of MoveIt Pro's core "Request Teleoperation" (10.1.0) whose iMarker branch sends `mobile_base` to Nav2; every other group runs the core "Move to Cartesian Pose". With `mobile_base` selected, the teleop also shows the end-effector Open and Close Gripper buttons; they run this package's gripper Objectives.
+
 ## Spine
 
 The spine joint (`franka_spine_vertical_joint`, group `spine`) moves through:
@@ -65,7 +67,7 @@ moveit_pro run -c mobile_fr3_duo_mock
 | `description/` | robot xacro and mock ros2_control hardware |
 | `launch/` | runtime entry point; frames, odometry and Nav2 |
 | `maps/`, `params/` | the room map and the Nav2 parameters |
-| `objectives/`, `waypoints/` | Objectives and saved waypoints |
+| `objectives/`, `waypoints/` | Objectives (including the Request Teleoperation copy) and saved waypoints |
 | `script/`, `test/` | the odometry and `/cmd_vel` bridges, and their unit tests |
 
 ## Controllers
