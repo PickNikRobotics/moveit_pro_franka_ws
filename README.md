@@ -16,6 +16,7 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | [`fr3_duo_spine_sim`](src/fr3_duo_spine_sim) | FR3 Duo on a fixed pedestal and spine | MuJoCo, robot only |
 | [`mobile_fr3_duo_mock`](src/mobile_fr3_duo_mock) | Mobile FR3 Duo: TMR v0.2 swerve base, spine, two FR3 v2 arms, two Franka Hands | mock hardware |
 | [`mobile_fr3_duo_sim`](src/mobile_fr3_duo_sim) | Mobile FR3 Duo | MuJoCo, with a room scene, lidars and Nav2 |
+| [`franka_spine_behaviors`](src/franka_spine_behaviors) | Behaviors for the spine Objectives (`CreateSpineState`, `GetSpineStateForPoseHeight`) | built with the workspace |
 | [`franka_behaviors`](src/franka_behaviors) | Franka-specific Behaviors (grasp, collision thresholds) | excluded from the build |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
 

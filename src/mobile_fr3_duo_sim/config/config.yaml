@@ -23,6 +23,7 @@ ros2_control:
     - "joint_trajectory_admittance_controller"
   controllers_inactive_at_startup:
     - "spine_jtc"
+    - "spine_jvc"
     - "left_jtac"
     - "right_jtac"
     - "left_jtac_w_spine"

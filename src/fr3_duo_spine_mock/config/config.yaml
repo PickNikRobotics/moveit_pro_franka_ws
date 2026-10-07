@@ -47,6 +47,7 @@ ros2_control:
     - "joint_trajectory_admittance_controller"
   controllers_inactive_at_startup:
     - "spine_jtc"
+    - "spine_jvc"
     - "left_jtac"
     - "right_jtac"
     - "left_jtac_w_spine"
@@ -65,6 +66,9 @@ objectives:
       - "moveit_pro::behaviors::MPCBehaviorsLoader"
       - "moveit_pro::behaviors::ConverterBehaviorsLoader"
       - "moveit_pro::behaviors::MujocoBehaviorsLoader"
+    # CreateSpineState and GetSpineStateForPoseHeight, for the spine Objectives.
+    spine:
+      - "franka_spine_behaviors::FrankaSpineBehaviorsLoader"
   objective_library_paths:
     core_objectives:
       package_name: "moveit_pro_objectives"

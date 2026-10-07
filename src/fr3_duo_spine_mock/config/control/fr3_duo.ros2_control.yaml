@@ -10,6 +10,8 @@ controller_manager:
       type: position_controllers/GripperActionController
     spine_jtc:
       type: joint_trajectory_controller/JointTrajectoryController
+    spine_jvc:
+      type: joint_velocity_controller/JointVelocityController
     joint_trajectory_admittance_controller:
       type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
     left_jtac_w_spine:
@@ -47,7 +49,11 @@ spine_jtc:
       - position
       - velocity
 
-
+spine_jvc:
+  ros__parameters:
+    planning_group_name: spine
+    max_joint_velocity: [0.1]
+    max_joint_acceleration: [0.5]
 
 joint_trajectory_admittance_controller:
   ros__parameters:
