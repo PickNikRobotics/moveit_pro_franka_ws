@@ -1,0 +1,32 @@
+###############################################################
+#
+#  This configures the robot to work with MoveIt Pro
+#
+###############################################################
+
+# Everything not set here comes from fr3_solo_mock: description, SRDF,
+# MoveIt parameters, controllers, Objectives and waypoints.
+based_on_package: "fr3_solo_mock"
+
+hardware:
+  robot_description:
+    # Overrides only these xacro arguments; the other inherited ones stay.
+    urdf_params:
+      - hardware_interface: "mujoco"
+      - mujoco_model: "mjcf/scene.xml"
+      - mujoco_viewer: "False"
+
+objectives:
+  # A child's list replaces the parent's, so the base loaders are repeated.
+  behavior_loader_plugins:
+    core:
+      - "moveit_pro::behaviors::CoreBehaviorsLoader"
+      - "moveit_pro::behaviors::MTCCoreBehaviorsLoader"
+      - "moveit_pro::behaviors::VisionBehaviorsLoader"
+      - "moveit_pro::behaviors::ConverterBehaviorsLoader"
+      - "moveit_pro::behaviors::MujocoBehaviorsLoader"
+  # Inherited libraries merge with this one.
+  objective_library_paths:
+    mujoco_objectives:
+      package_name: "moveit_pro_objectives"
+      relative_path: "objectives/mujoco"
