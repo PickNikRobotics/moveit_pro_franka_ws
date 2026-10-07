@@ -6,6 +6,32 @@ The scene is a 12 m by 12 m room with a narrow passage, obstacles, a table and t
 
 It inherits everything from `mobile_fr3_duo_mock` (robot description, SRDF, MoveIt parameters, Objectives and waypoints) and replaces only the hardware and the controllers.
 
+## Frames and odometry
+
+`world` -> `map` (fixed) -> `odom` (AMCL) -> planar joints -> `base_link`, the same chain as `mobile_fr3_duo_mock`; `world` -> `mj_world` anchors the simulator's own frames.
+
+- The simulator publishes the true base pose only as a message, `/ground_truth/odom` in frame `mj_world`.
+- `script/odometry_joint_state_publisher.py` is the only publisher of the planar joints and of `/odom`: it adds drift that grows with distance driven and angle turned, so AMCL has a real correction to make. Drift is on by default. For exact odometry, set the `odometry_drift` launch argument in `launch/additional_driver_nodes.launch.py` to `false`; it sets the bridge's `noise_enabled` parameter.
+- `joint_state_broadcaster` lists every joint except the planar ones (`config/control/`), so the true planar values never reach `/joint_states`.
+- `script/base_twist_to_planar.py` turns Nav2's `/cmd_vel` into planar joint velocities for `base_jgvc`, using the true heading.
+
+With drift on, base trajectory moves through `base_jtc` land off by the drift accumulated so far: MoveIt plans them in the drifted `odom` frame, and the controller drives the true joints. Nav2 moves do not, because AMCL corrects `map` -> `odom`.
+
+## MuJoCo xacro arguments
+
+A child configuration can override these through `urdf_params`; the defaults are this package's values.
+
+| Argument | Default |
+| --- | --- |
+| `mujoco_model` | `mjcf/scene.xml` |
+| `mujoco_model_package` | `mobile_fr3_duo_sim` |
+| `mujoco_keyframe` | `default` |
+| `mujoco_viewer` | `false` |
+| `publish_object_tf` | `true` |
+| `ground_truth_odom_topic` | `/ground_truth/odom` |
+| `ground_truth_odom_frame` | `mj_world` |
+| `base_link_name` | `base_link` |
+
 ## Build and run
 
 ```bash
@@ -23,7 +49,8 @@ moveit_pro run -c mobile_fr3_duo_sim
 | `description/` | MuJoCo ros2_control hardware macro |
 | `mjcf/` | MuJoCo scene and robot model |
 | `mjcf/assets/` | meshes and the conversion input URDF |
-| `launch/`, `script/` | lidar flattening, scan merging, odometry and `cmd_vel` bridges, Nav2 bring-up |
+| `launch/`, `script/` | frames, lidar flattening, scan merging, the odometry bridge, the `cmd_vel` bridge, Nav2 bring-up |
+| `test/` | tests for the odometry and `cmd_vel` bridges |
 | `maps/`, `params/` | room map, Nav2 and slam_toolbox parameters |
 | `objectives/` | Navigate to Clicked Point |
 

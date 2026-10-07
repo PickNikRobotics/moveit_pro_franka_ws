@@ -6,6 +6,10 @@ runtime_launch_file:
 hardware:
   launch_control_node: true
   launch_robot_state_publisher: true
+  # Static world -> map -> odom; mobile_fr3_duo_sim overrides this file.
+  additional_driver_launch_file:
+    package: "mobile_fr3_duo_mock"
+    path: "launch/frames.launch.py"
   robot_description:
     urdf:
       package: "mobile_fr3_duo_mock"

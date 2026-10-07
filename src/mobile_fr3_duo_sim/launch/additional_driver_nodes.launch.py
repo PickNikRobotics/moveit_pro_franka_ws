@@ -1,10 +1,11 @@
 import math
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -33,7 +34,7 @@ def generate_launch_description():
     )
 
     # Nav2 drives the base through this bridge: cmd_vel (base frame) becomes
-    # world-frame velocities on the planar joints, for base_jgvc.
+    # world-frame velocities on the planar joints, for base_jgvc, using the true heading.
     base_twist_to_planar = Node(
         package="mobile_fr3_duo_sim",
         executable="base_twist_to_planar.py",
@@ -50,11 +51,25 @@ def generate_launch_description():
         output="log",
     )
 
-    # The plugin's twist is in the odom frame; Nav2 needs it in base_link.
-    odom_twist_to_base = Node(
+    # The only publisher of the planar joints (odom -> base_link) and of /odom for
+    # Nav2: the simulator's true base pose with drift added, so AMCL has a real
+    # correction to make. odometry_drift:=false makes the odometry exact.
+    odometry_drift = DeclareLaunchArgument(
+        "odometry_drift",
+        default_value="true",
+        description="Add drift to the simulated odometry.",
+    )
+    odometry = Node(
         package="mobile_fr3_duo_sim",
-        executable="odom_twist_to_base.py",
-        name="odom_twist_to_base",
+        executable="odometry_joint_state_publisher.py",
+        name="odometry_joint_state_publisher",
+        parameters=[
+            {
+                "noise_enabled": ParameterValue(
+                    LaunchConfiguration("odometry_drift"), value_type=bool
+                )
+            }
+        ],
         output="log",
     )
 
@@ -101,14 +116,21 @@ def generate_launch_description():
         output="log",
     )
 
-    # Nav2 frames: mj_world -> map and odom -> world are identity; map -> odom
-    # comes from AMCL. The robot's pose below world comes from
-    # robot_state_publisher (planar joints), so odom -> base_link is exact.
-    static_tf_mj_world_to_map = Node(
+    # Frames: world -> map (fixed) -> odom (AMCL) -> planar joints -> base_link
+    # (robot_state_publisher, from the odometry bridge). world -> mj_world anchors
+    # the simulator's own frames, such as the scene cameras.
+    static_tf_world_to_map = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
-        name="static_tf_mj_world_to_map",
-        arguments=["--frame-id", "mj_world", "--child-frame-id", "map"],
+        name="static_tf_world_to_map",
+        arguments=["--frame-id", "world", "--child-frame-id", "map"],
+        output="log",
+    )
+    static_tf_world_to_mj_world = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_tf_world_to_mj_world",
+        arguments=["--frame-id", "world", "--child-frame-id", "mj_world"],
         output="log",
     )
     # Nav2, on the map built with slam_toolbox. AMCL owns map -> odom, and the
@@ -134,24 +156,17 @@ def generate_launch_description():
         }.items(),
     )
 
-    static_tf_odom_to_world = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="static_tf_odom_to_world",
-        arguments=["--frame-id", "odom", "--child-frame-id", "world"],
-        output="log",
-    )
-
     return LaunchDescription(
         [
+            odometry_drift,
             lidar_flattener,
             scan_merger,
             base_twist_to_planar,
-            odom_twist_to_base,
+            odometry,
             static_tf_lidar_front_ros,
             static_tf_lidar_rear_ros,
-            static_tf_mj_world_to_map,
+            static_tf_world_to_map,
+            static_tf_world_to_mj_world,
             nav2,
-            static_tf_odom_to_world,
         ]
     )

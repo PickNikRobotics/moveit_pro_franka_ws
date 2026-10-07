@@ -4,6 +4,12 @@ MoveIt Pro configuration for the Franka Mobile FR3 Duo: a TMR v0.2 swerve base, 
 
 This configuration runs on mock hardware (`mock_components/GenericSystem`), with no physics simulation and no driver.
 
+## Frames
+
+`world` -> `map` (fixed) -> `odom` -> planar joints (`planar_x`, `planar_y`, `planar_theta`) -> `base_link`.
+
+The URDF starts at `odom`. `launch/frames.launch.py` publishes `world` -> `map` and `map` -> `odom` as fixed identities, because mock hardware has no localization. The planar joints are the base pose in `odom`; `base_jtc` moves them.
+
 ## Requirements
 
 The robot description comes from the `franka_description` submodule:
@@ -27,6 +33,7 @@ moveit_pro run -c mobile_fr3_duo_mock
 | `config/control/` | ros2_control controllers |
 | `config/moveit/` | SRDF, joint limits, kinematics, jogging |
 | `description/` | robot xacro and mock ros2_control hardware |
+| `launch/` | runtime entry point and the static `world` -> `map` -> `odom` frames |
 | `objectives/`, `waypoints/` | Objectives and saved waypoints |
 
 ## Controllers

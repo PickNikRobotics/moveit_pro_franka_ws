@@ -5,6 +5,7 @@ MoveIt Pro 10.1.0+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md`
 ## Layout and inheritance
 
 - Each robot has `src/<robot>_mock` (mock hardware) and `src/<robot>_sim` (MuJoCo). The sim config sets `based_on_package: <robot>_mock` and overrides only the `hardware_interface` xacro argument (plus MuJoCo arguments). The mock URDF xacro then includes the sim package's MuJoCo `ros2_control` macro. Change the description in the mock package only.
+- Mobile FR3 Duo frames are `world` -> `map` (fixed) -> `odom` -> planar joints -> `base_link`, with the URDF rooted at `odom` (no option to root it elsewhere). In `mobile_fr3_duo_sim` the odometry bridge is the only publisher of the planar joints, and `joint_state_broadcaster` lists every MJCF joint except them: add any new MJCF joint to that list, or its state never reaches `/joint_states`.
 - There are no `_hw` packages yet. `src/franka_behaviors` is kept but excluded from the build (`COLCON_IGNORE`): it needs `franka_msgs` from franka_ros2, which is not in this workspace, and it predates the MoveIt Pro 10 Behavior API.
 
 ## moveit_pro_example_ws depends on this repository
