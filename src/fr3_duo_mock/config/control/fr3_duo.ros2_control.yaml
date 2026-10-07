@@ -56,6 +56,9 @@ joint_trajectory_admittance_controller:
     sensor_frames: [left_fr3v2_link8, right_fr3v2_link8]
     # Spine first: franka_spine_vertical_joint max_acceleration from franka_mobile_fr3_duo_moveit_config
     stop_accelerations: [3.75, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+    # The simulated arms trail the command when the simulation runs below realtime.
+    default_path_tolerance: 0.5
+    default_goal_time_tolerance: 0.5
 
 left_jtac_w_spine:
   ros__parameters:
@@ -64,6 +67,9 @@ left_jtac_w_spine:
     sensor_frames: [left_fr3v2_link8]
     # Spine first: franka_spine_vertical_joint max_acceleration from franka_mobile_fr3_duo_moveit_config
     stop_accelerations: [3.75, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+    # The simulated arms trail the command when the simulation runs below realtime.
+    default_path_tolerance: 0.5
+    default_goal_time_tolerance: 0.5
 
 left_jtac:
   ros__parameters:
@@ -71,6 +77,9 @@ left_jtac:
     ee_frames: [left_grasp_link]
     sensor_frames: [left_fr3v2_link8]
     stop_accelerations: [30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+    # The simulated arms trail the command when the simulation runs below realtime.
+    default_path_tolerance: 0.5
+    default_goal_time_tolerance: 0.5
 
 left_vfc:
   ros__parameters:
@@ -95,6 +104,9 @@ right_jtac_w_spine:
     sensor_frames: [right_fr3v2_link8]
     # Spine first: franka_spine_vertical_joint max_acceleration from franka_mobile_fr3_duo_moveit_config
     stop_accelerations: [3.75, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+    # The simulated arms trail the command when the simulation runs below realtime.
+    default_path_tolerance: 0.5
+    default_goal_time_tolerance: 0.5
 
 right_jtac:
   ros__parameters:
@@ -102,6 +114,9 @@ right_jtac:
     ee_frames: [right_grasp_link]
     sensor_frames: [right_fr3v2_link8]
     stop_accelerations: [30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+    # The simulated arms trail the command when the simulation runs below realtime.
+    default_path_tolerance: 0.5
+    default_goal_time_tolerance: 0.5
 
 right_vfc:
   ros__parameters:
