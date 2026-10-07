@@ -12,11 +12,9 @@ Third-party files:
 - src/mobile_fr3_duo_sim/mjcf/assets/finger_0.obj and finger_1.obj come from
   MuJoCo Menagerie, licensed under the Apache License, Version 2.0
   (src/mobile_fr3_duo_sim/mjcf/assets/LICENSE-mujoco_menagerie).
-- The other meshes in src/mobile_fr3_duo_sim/mjcf/assets/, and
-  src/mobile_fr3_duo_sim/mjcf/assets/robot_description.urdf, are copied,
-  converted or generated from franka_description 2.9.0, Copyright 2023 Franka
-  Robotics GmbH, licensed under the Apache License, Version 2.0
-  (LICENSES/Apache-2.0.txt).
+- The other meshes in src/mobile_fr3_duo_sim/mjcf/assets/ are copied or
+  converted from franka_description 2.9.0, Copyright 2023 Franka Robotics GmbH,
+  licensed under the Apache License, Version 2.0 (LICENSES/Apache-2.0.txt).
 - src/fr3_duo_sim/mjcf/assets/finger_0.obj and finger_1.obj come from MuJoCo
   Menagerie, licensed under the Apache License, Version 2.0
   (src/fr3_duo_sim/mjcf/assets/LICENSE-mujoco_menagerie).

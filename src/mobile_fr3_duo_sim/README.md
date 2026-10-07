@@ -49,7 +49,7 @@ moveit_pro run -c mobile_fr3_duo_sim
 | `config/control/` | ros2_control controllers for the simulation |
 | `description/` | MuJoCo ros2_control hardware macro |
 | `mjcf/` | MuJoCo scene and robot model |
-| `mjcf/assets/` | meshes, and `robot_description.urdf`, the original conversion input for the MuJoCo model; it predates the `odom` root, is not loaded at run time, and must not be used to regenerate the MJCF until you re-root it at `odom` |
+| `mjcf/assets/` | meshes |
 | `launch/`, `script/` | frames, lidar flattening, scan merging, the odometry bridge, the `cmd_vel` bridge, Nav2 bring-up |
 | `test/` | tests for the odometry and `cmd_vel` bridges |
 | `maps/`, `params/` | room map, Nav2 and slam_toolbox parameters |
