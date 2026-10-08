@@ -70,9 +70,13 @@ def main():
             p = self.declare_parameter
             self._odom_frame = p("odom_frame_id", "odom").value
             self._base_frame = p("base_frame_id", "base_link").value
-            self._pub = self.create_publisher(Odometry, p("odom_topic", "/odom").value, 10)
+            self._pub = self.create_publisher(
+                Odometry, p("odom_topic", "/odom").value, 10
+            )
             self._state = None
-            self.create_subscription(JointState, "/joint_states", self._on_joint_states, 10)
+            self.create_subscription(
+                JointState, "/joint_states", self._on_joint_states, 10
+            )
             self.create_timer(1.0 / float(p("odom_rate_hz", 50.0).value), self._tick)
 
         def _on_joint_states(self, msg):

@@ -3,7 +3,11 @@ import tempfile
 
 import yaml
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    OpaqueFunction,
+)
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
@@ -143,7 +147,9 @@ def generate_launch_description():
                 package="mobile_fr3_duo_mock",
                 executable="base_twist_to_planar.py",
                 name="base_twist_to_planar",
-                parameters=[{"ground_truth_topic": LaunchConfiguration("heading_topic")}],
+                parameters=[
+                    {"ground_truth_topic": LaunchConfiguration("heading_topic")}
+                ],
                 output="log",
             ),
             OpaqueFunction(function=nav2),

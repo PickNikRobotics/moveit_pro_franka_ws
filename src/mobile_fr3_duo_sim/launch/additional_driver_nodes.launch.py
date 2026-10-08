@@ -121,7 +121,11 @@ def generate_launch_description():
     navigation = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("mobile_fr3_duo_mock"), "launch", "navigation.launch.py"]
+                [
+                    FindPackageShare("mobile_fr3_duo_mock"),
+                    "launch",
+                    "navigation.launch.py",
+                ]
             )
         ),
         launch_arguments={

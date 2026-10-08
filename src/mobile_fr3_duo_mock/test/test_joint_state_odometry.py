@@ -83,7 +83,14 @@ def node(monkeypatch):
     sensor_msgs = types.ModuleType("sensor_msgs")
     sensor_msgs.msg = types.ModuleType("sensor_msgs.msg")
     sensor_msgs.msg.JointState = object
-    for module in (rclpy, rclpy.node, nav_msgs, nav_msgs.msg, sensor_msgs, sensor_msgs.msg):
+    for module in (
+        rclpy,
+        rclpy.node,
+        nav_msgs,
+        nav_msgs.msg,
+        sensor_msgs,
+        sensor_msgs.msg,
+    ):
         monkeypatch.setitem(sys.modules, module.__name__, module)
     joint_state_odometry.main()
     return spun[0]
@@ -100,7 +107,7 @@ def _joint_state(stamp, planar_x, planar_y, planar_theta, velocities=(0.0, 0.0, 
 
 
 def _tick(node):
-    (_, callback), = node.timers
+    ((_, callback),) = node.timers
     callback()
 
 
@@ -112,8 +119,10 @@ def test_no_odometry_before_the_first_planar_joint_state(node):
     _tick(node)
     node.subscriptions["/joint_states"](
         types.SimpleNamespace(
-            header=types.SimpleNamespace(stamp="t0"), name=["left_fr3_joint1"],
-            position=[0.3], velocity=[0.0],
+            header=types.SimpleNamespace(stamp="t0"),
+            name=["left_fr3_joint1"],
+            position=[0.3],
+            velocity=[0.0],
         )
     )
     _tick(node)
@@ -145,4 +154,6 @@ def test_each_tick_publishes_the_latest_joint_state_with_its_stamp(node):
             (math.sin(math.pi / 4), math.cos(math.pi / 4))
         )
         twist = odom.twist.twist
-        assert (twist.linear.x, twist.linear.y, twist.angular.z) == pytest.approx((0.3, 0.0, 0.2))
+        assert (twist.linear.x, twist.linear.y, twist.angular.z) == pytest.approx(
+            (0.3, 0.0, 0.2)
+        )
