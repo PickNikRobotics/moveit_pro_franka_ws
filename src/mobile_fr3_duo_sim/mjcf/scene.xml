@@ -119,8 +119,8 @@
       rgba="0.7 0.7 0.2 1"
     />
 
-    <!-- Table in front of the robot: 0.8 m x 1.2 m, top at 0.75 m. -->
-    <body name="table" pos="1.2 0 0">
+    <!-- Table in front of the robot, clear of the Ready arms and of the stowed robot near the map origin: 0.8 m x 1.2 m, top at 0.75 m. -->
+    <body name="table" pos="1.5 0 0">
       <geom
         name="table_top"
         type="box"
@@ -159,7 +159,7 @@
     </body>
 
     <!-- Small free cylinder on the table (r 3 cm, 12 cm tall). -->
-    <body name="cylinder" pos="0.95 0 0.81">
+    <body name="cylinder" pos="1.25 0 0.81">
       <freejoint name="cylinder_joint" />
       <geom
         name="cylinder"
@@ -207,7 +207,7 @@
   <keyframe>
     <key
       name="default"
-      qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.7853981633974483 0 -2.356194490192345 0 1.5707963267948966 0.7853981633974483 0 0 0 -0.7853981633974483 0 -2.356194490192345 0 1.5707963267948966 0.7853981633974483 0 0 0.95 0 0.81 1 0 0 0"
+      qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.7853981633974483 0 -2.356194490192345 0 1.5707963267948966 0.7853981633974483 0 0 0 -0.7853981633974483 0 -2.356194490192345 0 1.5707963267948966 0.7853981633974483 0 0 1.25 0 0.81 1 0 0 0"
       ctrl="0 0 0 0 0 -0.7853981633974483 0 -2.356194490192345 0 1.5707963267948966 0.7853981633974483 0 0 -0.7853981633974483 0 -2.356194490192345 0 1.5707963267948966 0.7853981633974483 0"
     />
   </keyframe>
