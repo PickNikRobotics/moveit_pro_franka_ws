@@ -1,6 +1,6 @@
 # Franka Configurations for MoveIt Pro
 
-[MoveIt Pro](https://docs.picknik.ai) configuration packages for [Franka Robotics](https://franka.de) robots: the Franka Research 3 (FR3) arm.
+[MoveIt Pro](https://docs.picknik.ai) configuration packages for [Franka Robotics](https://franka.de) robots: the Franka Research 3 (FR3) arm and the FR3 Duo.
 
 This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 
@@ -10,10 +10,12 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | --- | --- | --- |
 | [`fr3_solo_mock`](src/fr3_solo_mock) | One FR3 arm with a Franka Hand | mock hardware |
 | [`fr3_solo_sim`](src/fr3_solo_sim) | One FR3 arm with a Franka Hand | MuJoCo, robot only |
+| [`fr3_duo_mock`](src/fr3_duo_mock) | FR3 Duo without a spine: the Duo mount on a fixed base, two FR3 arms, two Franka Hands | mock hardware |
+| [`fr3_duo_sim`](src/fr3_duo_sim) | FR3 Duo without a spine | MuJoCo, robot only |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
 
 Each `_sim` package inherits from its `_mock` package (`based_on_package`) and sets the mock's `ros2_control_xacro` argument to its own MuJoCo hardware.
-`fr3_solo_sim` changes only the hardware.
+`fr3_solo_sim` and `fr3_duo_sim` change only the hardware.
 Real-hardware (`_hw`) configurations are not part of this workspace yet; [issue #10](https://github.com/PickNikRobotics/moveit_pro_franka_ws/issues/10) tracks them.
 
 ## Getting started
