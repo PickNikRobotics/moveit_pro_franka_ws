@@ -1,0 +1,140 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'The picknikciuser/moveit-pro tag to test against, without the distro (e.g. 10.1.0)'
+        required: false
+        default: ''
+  # Run every 6 hours Mon-Fri
+  schedule:
+    - cron: "0 */6 * * 1-5"
+
+jobs:
+  # Builds and tests the workspace inside the MoveIt Pro image, as PickNikRobotics/moveit_pro_ci's
+  # workspace_integration_test.yaml does; the default tag is the MoveIt Pro version this workspace targets.
+  integration-test-in-studio-container:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        ros_distro: [jazzy]
+    env:
+      MOVEIT_LICENSE_KEY: ${{ secrets.STUDIO_CI_LICENSE_KEY }}
+      RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+      CYCLONEDDS_URI: /tmp/cyclonedds.xml
+      MOVEIT_DOCKER_TAG: ${{ github.event.inputs.image_tag || '10.1.0' }}-${{ matrix.ros_distro }}
+      # MoveIt Pro binds its license to machine hardware; one fixed identity keeps every runner on
+      # the same license activation (as in moveit_pro_ci).
+      MOVEIT_HOST_SYSFS: /tmp/moveit_pro_ci_sysfs
+    container:
+      image: picknikciuser/moveit-pro:${{ github.event.inputs.image_tag || '10.1.0' }}-${{ matrix.ros_distro }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # Must run before anything that starts MoveIt Pro. See MOVEIT_HOST_SYSFS above.
+      - name: Provide a hardware identity for license activation
+        run: |
+          interface="${MOVEIT_HOST_SYSFS}/class/net/eth0"
+          mkdir -p "${interface}/device"
+          echo 'd4:93:90:2d:8f:9b' > "${interface}/address"
+          echo 1 > "${interface}/type"
+          echo 0 > "${interface}/addr_assign_type"
+
+      - name: Set USER_WS environment variable
+        run: echo "USER_WS=/__w/$(basename ${{ github.repository }})/$(basename ${{ github.repository }})" >> $GITHUB_ENV
+
+      # Meshes, images and the Nav2 map are Git LFS files; franka_description is a public https submodule.
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: recursive
+          lfs: true
+
+      # The 'lo' interfaces will not have multicast, and will fail trying to claim a participant index
+      # with the default cyclone dds config. We set one for the unit tests to be able to execute.
+      - name: Configure DDS
+        run: |
+          cat <<EOF > /tmp/cyclonedds.xml
+          <?xml version="1.0" ?>
+          <CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+           <Domain id="any">
+               <General>
+                   <Interfaces>
+                       <NetworkInterface autodetermine="true"/>
+                   </Interfaces>
+                   <AllowMulticast>false</AllowMulticast>
+               </General>
+               <Discovery>
+                   <ParticipantIndex>auto</ParticipantIndex>
+                   <Peers>
+                       <Peer Address="127.0.0.1" />
+                   </Peers>
+                   <MaxAutoParticipantIndex>50</MaxAutoParticipantIndex>
+               </Discovery>
+           </Domain>
+          </CycloneDDS>
+          EOF
+
+      - name: Install colcon mixins
+        run: |
+          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          colcon mixin update
+          colcon metadata add default https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml
+          colcon metadata update
+          cp $USER_WS/colcon-defaults.yaml ~/.colcon/defaults.yaml
+          echo "Using ~/.colcon/defaults.yaml:"
+          cat ~/.colcon/defaults.yaml
+
+      - name: Install rosdeps
+        run: |
+          . /opt/ros/${{ matrix.ros_distro }}/setup.sh
+          . /opt/overlay_ws/install/setup.sh
+          apt-get update
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
+
+      - name: Run colcon build
+        run: |
+          . /opt/ros/${{ matrix.ros_distro }}/setup.sh
+          . /opt/overlay_ws/install/setup.sh
+          colcon build
+
+      - name: Run colcon test
+        run: |
+          . /opt/ros/${{ matrix.ros_distro }}/setup.sh
+          . /opt/overlay_ws/install/setup.sh
+          . ./install/setup.sh
+          external_packages="$(colcon list --base-paths src/external_dependencies --names-only || true)"
+          if [ -n "$external_packages" ]; then
+              colcon test --packages-skip $external_packages --retest-until-pass 1 --executor sequential
+          else
+              colcon test --retest-until-pass 1 --executor sequential
+          fi
+
+      - if: always()
+        run: |
+          colcon test-result --verbose
+
+      # Upload test results as artifacts to be able to see them in the github actions UI.
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: test-results-${{ matrix.ros_distro }}
+          path: |
+            build/*/test_results/
+            build/*/Testing/
+          retention-days: 15
+
+  ensure-no-ssh-in-gitmodules:
+    name: Ensure no SSH URLs in .gitmodules
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check .gitmodules file for Git-over-SSH URLs
+        run: "! grep 'git@' .gitmodules"

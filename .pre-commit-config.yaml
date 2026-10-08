@@ -1,0 +1,88 @@
+# To use:
+#
+#     pre-commit run -a
+#
+# Or:
+#
+#     pre-commit install  # (runs every time you commit in git)
+#
+# To update this file:
+#
+#     pre-commit autoupdate
+#
+# See https://github.com/pre-commit/pre-commit
+# Vendored dependencies and Git LFS files (meshes, images, the Nav2 map) are not checked.
+exclude: ^src/external_dependencies/|\.(stl|STL|obj|OBJ|dae|DAE|mtl|png|jpg|jpeg|pgm|onnx|fbx|gltf|glb|ply|3ds|blend)$
+repos:
+  # Standard hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+        args: ["--unsafe"] # Allows custom YAML tags, such as !degrees
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: fix-byte-order-marker
+
+  - repo: https://github.com/psf/black
+    rev: 25.9.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: ["--write-changes", "-L", "atleast,inout,ether,tread,retuned"]
+        exclude: \.(svg|pyc|lock)$
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v14.0.6
+    hooks:
+      - id: clang-format
+        files: \.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|m|proto|vert)$
+        # -i arg is included by default by the hook
+        args: ["-fallback-style=none"]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args:
+          [
+            "--no-warnings",
+            "--config-data",
+            "{extends: default, rules: {line-length: disable, braces: {max-spaces-inside: 1}, indentation: disable, empty-lines: {max-end: 0, max-start: 1}}}",
+          ]
+        types: [text]
+        files: \.(yml|yaml)$
+
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.14.1
+    hooks:
+      - id: markdown-link-check
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.14.0
+    hooks:
+      - id: hadolint
+        name: "Lint Dockerfiles"
+        language: docker_image
+        types: ["dockerfile"]
+        entry: hadolint/hadolint:v2.14.0 hadolint
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v4.0.0-alpha.8"
+    hooks:
+      # Prettier formats the XML (Objectives, MJCF, SRDF).
+      - id: prettier
+        additional_dependencies:
+          - "prettier@3.1.0"
+          - "@prettier/plugin-xml@3.3.1"
+        files: \.(xml)$
