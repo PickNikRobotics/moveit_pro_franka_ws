@@ -1,6 +1,6 @@
 # Franka Configurations for MoveIt Pro
 
-[MoveIt Pro](https://docs.picknik.ai) configuration packages for [Franka Robotics](https://franka.de) robots: the Franka Research 3 (FR3) arm and the FR3 Duo.
+[MoveIt Pro](https://docs.picknik.ai) configuration packages for [Franka Robotics](https://franka.de) robots: the Franka Research 3 (FR3) arm, the FR3 Duo and the Mobile FR3 Duo.
 
 This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 
@@ -14,16 +14,18 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | [`fr3_duo_sim`](src/fr3_duo_sim) | FR3 Duo without a spine | MuJoCo, robot only |
 | [`fr3_duo_spine_mock`](src/fr3_duo_spine_mock) | FR3 Duo on a fixed pedestal and spine: two FR3 v2 arms, two Franka Hands | mock hardware |
 | [`fr3_duo_spine_sim`](src/fr3_duo_spine_sim) | FR3 Duo on a fixed pedestal and spine | MuJoCo, robot only |
+| [`mobile_fr3_duo_mock`](src/mobile_fr3_duo_mock) | Mobile FR3 Duo: TMR v0.2 swerve base, spine, two FR3 v2 arms, two Franka Hands | mock hardware, with Nav2 on a room map |
+| [`mobile_fr3_duo_sim`](src/mobile_fr3_duo_sim) | Mobile FR3 Duo | MuJoCo, with a room scene, lidars and Nav2 |
 | [`franka_behaviors`](src/franka_behaviors) | Franka Behaviors: the spine Behaviors (`CreateSpineState`, `GetSpineStateForPoseHeight`) | built with the workspace |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
 
 Each `_sim` package inherits from its `_mock` package (`based_on_package`) and sets the mock's `ros2_control_xacro` argument to its own MuJoCo hardware.
-`fr3_solo_sim`, `fr3_duo_sim` and `fr3_duo_spine_sim` change only the hardware.
+`fr3_solo_sim`, `fr3_duo_sim` and `fr3_duo_spine_sim` change only the hardware; `mobile_fr3_duo_sim` also replaces the controllers and adds AMCL and laser obstacle layers to the mock's Nav2 (see its README).
 Real-hardware (`_hw`) configurations are not part of this workspace yet; [issue #10](https://github.com/PickNikRobotics/moveit_pro_franka_ws/issues/10) tracks them.
 
 ## Getting started
 
-Meshes and images are stored in Git LFS, so install [git-lfs](https://git-lfs.com) before you clone.
+The MuJoCo meshes and the Nav2 map are stored in Git LFS, so install [git-lfs](https://git-lfs.com) before you clone.
 
 ```bash
 git lfs install
@@ -34,7 +36,7 @@ moveit_pro build
 moveit_pro run -c fr3_solo_sim
 ```
 
-Use `-c` with any configuration package from the table.
+Use `-c` with any configuration package from the table, for example `-c mobile_fr3_duo_sim`.
 If you cloned without `--recurse-submodules`, run `git submodule update --init` first.
 If you cloned without git-lfs, run `git lfs install` and `git lfs pull` first.
 
