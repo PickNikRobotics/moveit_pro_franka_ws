@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fr3_duo">
+  <!-- The ros2_control hardware file: this package's mock hardware unless a config sets another through urdf_params. -->
+  <xacro:arg name="ros2_control_xacro" default="$(find fr3_duo_spine_mock)/description/fr3_duo_spine_mock.ros2_control.xacro"/>
+
+  <xacro:include filename="$(find franka_description)/accessories/franka_spine_v0_1/franka_spine.xacro"/>
+  <xacro:include filename="$(find franka_description)/robots/fr3_duo/fr3_duo.xacro"/>
+
+  <link name="world"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+  <!-- Fixed pedestal for the spine. Its top is the spine mounting height, read from the spine kinematics. -->
+  <xacro:property name="pedestal_height" value="${spine_kinematics['franka_spine_fixed_joint']['kinematic']['z']}"/>
+  <xacro:property name="pedestal_x" value="${spine_kinematics['franka_spine_fixed_joint']['kinematic']['x']}"/>
+  <xacro:property name="pedestal_size" value="0.4"/>
+  <link name="base_link">
+    <visual>
+      <origin xyz="${pedestal_x} 0 ${pedestal_height/2}"/>
+      <geometry>
+        <box size="${pedestal_size} ${pedestal_size} ${pedestal_height}"/>
+      </geometry>
+      <material name="pedestal_grey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="${pedestal_x} 0 ${pedestal_height/2}"/>
+      <geometry>
+        <box size="${pedestal_size} ${pedestal_size} ${pedestal_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="${pedestal_x} 0 ${pedestal_height/2}"/>
+      <mass value="30.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+
+  <xacro:franka_spine parent="base_link"/>
+
+  <xacro:fr3_duo
+    name="fr3_duo"
+    robot_types="${['fr3v2', 'fr3v2']}"
+    hand="true"
+    ee_id="franka_hand"
+    special_connection=""
+    xyz_ee="0 0 0"
+    rpy_ee="0 0 ${-pi/4}"
+    tcp_xyz=""
+    tcp_rpy="0 0 0"
+    safety_distance="0.03"
+    with_sc="false"
+    include_self_collision_geometry="true"
+    description_pkg="franka_description"
+    base_mount="franka_spine_mounting_point"
+    connected_to="base_link"
+    arm_prefixes="${['left', 'right']}">
+    <arm0_extras/>
+    <arm1_extras/>
+  </xacro:fr3_duo>
+
+  <!-- Grasp frames following the MoveIt Pro teleoperation convention: Z out of the gripper, X along the finger motion -->
+  <link name="left_grasp_link"/>
+  <joint name="left_grasp_link_joint" type="fixed">
+    <parent link="left_fr3v2_hand_tcp"/>
+    <child link="left_grasp_link"/>
+    <origin xyz="0 0 0" rpy="0 0 ${-pi/2}"/>
+  </joint>
+
+  <link name="right_grasp_link"/>
+  <joint name="right_grasp_link_joint" type="fixed">
+    <parent link="right_fr3v2_hand_tcp"/>
+    <child link="right_grasp_link"/>
+    <origin xyz="0 0 0" rpy="0 0 ${-pi/2}"/>
+  </joint>
+
+  <xacro:include filename="$(arg ros2_control_xacro)"/>
+</robot>
