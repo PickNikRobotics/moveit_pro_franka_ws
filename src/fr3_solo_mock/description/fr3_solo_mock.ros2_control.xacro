@@ -29,4 +29,7 @@
       <xacro:fr3_solo_mock_commanded_joint name="fr3_finger_joint1" />
     </ros2_control>
   </xacro:macro>
+
+  <!-- Included through the ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:fr3_solo_mock_ros2_control />
 </robot>
