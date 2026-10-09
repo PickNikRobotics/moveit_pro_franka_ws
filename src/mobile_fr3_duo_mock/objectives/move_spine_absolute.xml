@@ -30,10 +30,12 @@
         <Metadata subcategory="Motion - Execute" />
       </MetadataFields>
       <input_port name="position" default="0.3" type="double">
-        Absolute spine height in meters, within the spine travel. A height outside the travel fails.
+        Absolute spine height in meters, within the spine travel. A height
+        outside the travel fails.
       </input_port>
       <input_port name="velocity" default="0.05" type="double">
-        Used by the real spine. Ignored in mock and sim, where the spine joint limits set the speed.
+        Used by the real spine. Ignored in mock and sim, where the spine joint
+        limits set the speed.
       </input_port>
       <input_port name="acceleration" default="0.1" type="double">
         Used by the real spine. Ignored in mock and sim.
@@ -42,7 +44,8 @@
         Used by the real spine. Ignored in mock and sim.
       </input_port>
       <input_port name="timeout" default="60.0" type="double">
-        Used by the real spine. Ignored in mock and sim, where trajectory execution has its own timeout.
+        Used by the real spine. Ignored in mock and sim, where trajectory
+        execution has its own timeout.
       </input_port>
       <input_port
         name="action_name"

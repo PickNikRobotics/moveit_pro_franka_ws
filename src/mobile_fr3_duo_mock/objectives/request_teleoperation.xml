@@ -112,7 +112,10 @@
                           target_frame_id="map"
                           output_pose="{base_goal}"
                         />
-                        <SubTree ID="Stow Arms for Navigation" _collapsed="true" />
+                        <SubTree
+                          ID="Stow Arms for Navigation"
+                          _collapsed="true"
+                        />
                         <Action
                           ID="SwitchController"
                           activate_controllers="base_jgvc"

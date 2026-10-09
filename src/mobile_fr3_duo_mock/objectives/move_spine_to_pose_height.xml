@@ -41,10 +41,13 @@
         default="{target_pose}"
         type="geometry_msgs::msg::PoseStamped"
       >
-        Pose the arms should reach. The arm mount (franka_spine_mounting_point) is driven to its height, clamped to the spine travel.
+        Pose the arms should reach. The arm
+        mount (franka_spine_mounting_point) is driven to its height, clamped to
+        the spine travel.
       </input_port>
       <input_port name="height_bias" default="0.0" type="double">
-        Added to the pose height in meters. Positive puts the arm mount above the pose.
+        Added to the pose height in meters. Positive puts the arm mount above
+        the pose.
       </input_port>
     </SubTree>
   </TreeNodesModel>
