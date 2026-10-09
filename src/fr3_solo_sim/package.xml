@@ -3,7 +3,10 @@
   <name>fr3_solo_sim</name>
   <version>10.1.0</version>
 
-  <description>MoveIt Pro MuJoCo simulation configuration for one Franka FR3 arm with a Franka Hand.</description>
+  <description>
+    MoveIt Pro MuJoCo simulation configuration for one Franka FR3 arm with a
+    Franka Hand.
+  </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>
 
