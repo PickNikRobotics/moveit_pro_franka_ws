@@ -3,7 +3,7 @@
 MoveIt Pro MuJoCo simulation configuration for the Franka FR3 Duo without a spine: the FR3 Duo mount on a fixed base, two FR3 arms and two Franka Hands.
 The scene holds the robot only: a floor and a light, no environment.
 
-It inherits everything from `fr3_duo_mock` (robot description, SRDF, MoveIt parameters, controllers, Objectives and waypoints) and changes only the ros2_control hardware to MuJoCo, through the `hardware_interface` xacro argument.
+It inherits everything from `fr3_duo_mock` (robot description, SRDF, MoveIt parameters, controllers, Objectives and waypoints) and changes only the ros2_control hardware to MuJoCo, through the mock's `ros2_control_xacro` xacro argument.
 
 ## Build and run
 
@@ -22,8 +22,6 @@ moveit_pro run -c fr3_duo_sim
 | `description/` | MuJoCo ros2_control hardware macro |
 | `mjcf/scene.xml` | scene: floor, light and the `default` keyframe (both arms in the "ready" pose) |
 | `mjcf/fr3_duo.xml`, `mjcf/assets/` | robot model and meshes |
-
-A configuration with its own environment can reuse `mjcf/fr3_duo.xml` by including it in its own scene, with a keyframe of 18 joint positions and 16 actuator commands.
 
 ## Third-party assets
 

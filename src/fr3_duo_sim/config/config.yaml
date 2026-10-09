@@ -6,6 +6,9 @@ hardware:
   robot_description:
     # Overrides only these xacro arguments; the other inherited ones stay.
     urdf_params:
-      - hardware_interface: "mujoco"
+      # The MuJoCo ros2_control hardware, in place of fr3_duo_mock's mock hardware.
+      - ros2_control_xacro:
+          package: "fr3_duo_sim"
+          path: "description/fr3_duo_mujoco.ros2_control.xacro"
       - mujoco_model: "mjcf/scene.xml"
       - mujoco_viewer: "False"

@@ -13,8 +13,6 @@ hardware:
     srdf:
       package: "fr3_duo_mock"
       path: "config/moveit/franka.srdf"
-    urdf_params:
-      - hardware_interface: "mock"
 
 moveit_params:
   joint_group_name: "manipulator"

@@ -6,8 +6,8 @@ For the FR3 Duo on the vertical spine, see `fr3_duo_spine_mock`.
 This configuration runs on mock hardware (`mock_components/GenericSystem`), with no physics simulation and no driver.
 The mount stands at a fixed height above `world`, with no pedestal geometry.
 
-It is also the parent configuration for two-arm FR3 configurations without a spine, for example `fr3_duo_sim`.
-The robot and SRDF are named `franka`. The joint names are the franka_description FR3 names with the arm prefix (`left_fr3_joint1` to `left_fr3_joint7`, `left_fr3_finger_joint1`, and the same with `right_`). The planning groups are `left_manipulator`, `right_manipulator` and `manipulator` (both arms). A configuration that reuses this SRDF must keep these names.
+The robot xacro takes its ros2_control hardware from the `ros2_control_xacro` argument, which defaults to this package's mock hardware. `fr3_duo_sim` inherits this configuration through `based_on_package` and sets that argument to its MuJoCo hardware.
+The robot and SRDF are named `franka`. The joint names are the franka_description FR3 names with the arm prefix (`left_fr3_joint1` to `left_fr3_joint7`, `left_fr3_finger_joint1`, and the same with `right_`). The planning groups are `left_manipulator`, `right_manipulator` and `manipulator` (both arms).
 
 ## Build and run
 

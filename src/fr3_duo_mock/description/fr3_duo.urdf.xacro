@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="franka">
-  <xacro:arg name="hardware_interface" default="mock"/>
-  <xacro:arg name="mujoco_model" default="mjcf/scene.xml"/>
-  <xacro:arg name="mujoco_viewer" default="false"/>
+  <!-- The ros2_control hardware file: this package's mock hardware unless a config sets another through urdf_params. -->
+  <xacro:arg name="ros2_control_xacro" default="$(find fr3_duo_mock)/description/fr3_duo_mock.ros2_control.xacro"/>
 
   <xacro:include filename="$(find franka_description)/accessories/fr3_duo_mount_v0_3/fr3_duo_mount.xacro"/>
   <xacro:include filename="$(find franka_description)/robots/common/franka_robot.xacro"/>
@@ -49,13 +48,5 @@
   <xacro:fr3_duo_arm side="right"/>
   <xacro:fr3_duo_arm side="left"/>
 
-  <xacro:if value="${'$(arg hardware_interface)' == 'mock'}">
-    <xacro:include filename="$(find fr3_duo_mock)/description/fr3_duo_mock.ros2_control.xacro"/>
-    <xacro:fr3_duo_mock_ros2_control/>
-  </xacro:if>
-
-  <xacro:if value="${'$(arg hardware_interface)' == 'mujoco'}">
-    <xacro:include filename="$(find fr3_duo_sim)/description/fr3_duo_mujoco.ros2_control.xacro"/>
-    <xacro:fr3_duo_mujoco_ros2_control mujoco_model="$(arg mujoco_model)" mujoco_viewer="$(arg mujoco_viewer)"/>
-  </xacro:if>
+  <xacro:include filename="$(arg ros2_control_xacro)"/>
 </robot>

@@ -34,4 +34,7 @@
       <xacro:fr3_duo_mock_arm_joints prefix="right"/>
     </ros2_control>
   </xacro:macro>
+
+  <!-- Included through the ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:fr3_duo_mock_ros2_control/>
 </robot>
