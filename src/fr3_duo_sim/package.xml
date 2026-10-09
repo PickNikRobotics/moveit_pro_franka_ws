@@ -3,7 +3,8 @@
   <name>fr3_duo_sim</name>
   <version>10.1.0</version>
   <description>
-    MoveIt Pro MuJoCo simulation configuration for the Franka FR3 Duo without a spine, on a fixed base.
+    MoveIt Pro MuJoCo simulation configuration for the Franka FR3 Duo without a
+    spine, on a fixed base.
   </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>
