@@ -3,7 +3,8 @@
   <name>fr3_duo_spine_sim</name>
   <version>10.1.0</version>
   <description>
-    MoveIt Pro MuJoCo simulation configuration for the Franka FR3 Duo on a fixed pedestal and spine.
+    MoveIt Pro MuJoCo simulation configuration for the Franka FR3 Duo on a fixed
+    pedestal and spine.
   </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>

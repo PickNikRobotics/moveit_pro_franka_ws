@@ -29,13 +29,13 @@
 #include <franka_behaviors/get_spine_state_for_pose_height.hpp>
 #include <franka_behaviors/spine_height.hpp>
 
+#include <tf2_ros/buffer.h>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <moveit_msgs/msg/planning_scene.hpp>
 #include <moveit_msgs/msg/robot_state.hpp>
 #include <moveit_pro_behavior_interface/get_required_ports.hpp>
 #include <moveit_pro_behavior_interface/metadata_fields.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <tf2_ros/buffer.h>
 
 #include <algorithm>
 #include <iterator>

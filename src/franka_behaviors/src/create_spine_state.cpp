@@ -73,9 +73,10 @@ BT::KeyValueVector CreateSpineState::metadata()
 
 BT::NodeStatus CreateSpineState::tick()
 {
-  const auto ports = moveit_pro::behaviors::getRequiredInputs(
-      getInput<double>(kPortPosition), getInput<std::string>(kPortSpineJointName),
-      getInput<double>(kPortMinSpineValue), getInput<double>(kPortMaxSpineValue));
+  const auto ports = moveit_pro::behaviors::getRequiredInputs(getInput<double>(kPortPosition),
+                                                              getInput<std::string>(kPortSpineJointName),
+                                                              getInput<double>(kPortMinSpineValue),
+                                                              getInput<double>(kPortMaxSpineValue));
   if (!ports.has_value())
   {
     getBehaviorContext()->logger->publishFailureMessage(name(), "Missing required input: " + ports.error());

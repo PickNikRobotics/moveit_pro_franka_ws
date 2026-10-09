@@ -49,5 +49,4 @@ public:
 };
 }  // namespace franka_behaviors
 
-PLUGINLIB_EXPORT_CLASS(franka_behaviors::FrankaBehaviorsLoader,
-                       moveit_pro::behaviors::SharedResourcesNodeLoaderBase);
+PLUGINLIB_EXPORT_CLASS(franka_behaviors::FrankaBehaviorsLoader, moveit_pro::behaviors::SharedResourcesNodeLoaderBase);
