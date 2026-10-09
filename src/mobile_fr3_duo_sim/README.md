@@ -19,7 +19,7 @@ This package has no base trajectory controller. With drift on, a planned base tr
 
 ## MuJoCo xacro arguments
 
-A child configuration can override these through `urdf_params`; the defaults are this package's values.
+`description/mobile_fr3_duo_mujoco.ros2_control.xacro` declares these arguments, with this package's values as defaults.
 
 | Argument | Default |
 | --- | --- |

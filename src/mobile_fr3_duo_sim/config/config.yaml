@@ -3,7 +3,10 @@ based_on_package: mobile_fr3_duo_mock
 hardware:
   robot_description:
     urdf_params:
-      - hardware_interface: "mujoco"
+      # The MuJoCo ros2_control hardware, in place of mobile_fr3_duo_mock's mock hardware.
+      - ros2_control_xacro:
+          package: "mobile_fr3_duo_sim"
+          path: "description/mobile_fr3_duo_mujoco.ros2_control.xacro"
       - mujoco_model: "mjcf/scene.xml"
       - mujoco_viewer: "False"
   additional_driver_launch_file:

@@ -17,8 +17,6 @@ hardware:
     srdf:
       package: "mobile_fr3_duo_mock"
       path: "config/moveit/mobile_fr3_duo.srdf"
-    urdf_params:
-      - hardware_interface: "mock"
 
 moveit_params:
   joint_group_name: "manipulator"

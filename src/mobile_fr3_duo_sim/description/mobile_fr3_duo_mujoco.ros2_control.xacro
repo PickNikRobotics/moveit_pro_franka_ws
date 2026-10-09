@@ -1,5 +1,15 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- MuJoCo settings; a config sets them through urdf_params. -->
+  <xacro:arg name="mujoco_model" default="mjcf/scene.xml"/>
+  <xacro:arg name="mujoco_model_package" default="mobile_fr3_duo_sim"/>
+  <xacro:arg name="mujoco_keyframe" default="default"/>
+  <xacro:arg name="mujoco_viewer" default="false"/>
+  <xacro:arg name="publish_object_tf" default="true"/>
+  <xacro:arg name="ground_truth_odom_topic" default="/ground_truth/odom"/>
+  <xacro:arg name="ground_truth_odom_frame" default="mj_world"/>
+  <xacro:arg name="base_link_name" default="base_link"/>
+
   <!-- MujocoSystem takes the joints and actuators from the MJCF, so none are listed here. -->
   <xacro:macro
     name="mobile_fr3_duo_mujoco_ros2_control"
@@ -39,4 +49,15 @@
       </hardware>
     </ros2_control>
   </xacro:macro>
+
+  <!-- Included through the mock's ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:mobile_fr3_duo_mujoco_ros2_control
+    mujoco_model="$(arg mujoco_model)"
+    mujoco_model_package="$(arg mujoco_model_package)"
+    mujoco_keyframe="$(arg mujoco_keyframe)"
+    mujoco_viewer="$(arg mujoco_viewer)"
+    publish_object_tf="$(arg publish_object_tf)"
+    ground_truth_odom_topic="$(arg ground_truth_odom_topic)"
+    ground_truth_odom_frame="$(arg ground_truth_odom_frame)"
+    base_link_name="$(arg base_link_name)"/>
 </robot>

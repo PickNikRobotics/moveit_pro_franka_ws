@@ -20,7 +20,7 @@ Every navigation Objective first runs the subtree **"Stow Arms for Navigation"**
 | --- | --- |
 | "Navigate to Clicked Point" | prompts for a point in the Visualization pane, stows the arms, then drives there |
 | "Move Base to Ready" | stows the arms, then drives to the map origin |
-| "Stow Arms for Navigation" | the shared stow step; a child configuration calls it before its own navigation |
+| "Stow Arms for Navigation" | the stow step that every navigation Objective runs first |
 
 `mobile_fr3_duo_sim` reuses this launch file. It adds AMCL and its laser obstacle layers through `params_overlay`: mappings merge and lists replace.
 
