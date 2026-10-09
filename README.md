@@ -12,7 +12,7 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | [`fr3_solo_sim`](src/fr3_solo_sim) | One FR3 arm with a Franka Hand | MuJoCo, robot only |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
 
-Each `_sim` package inherits from its `_mock` package (`based_on_package`).
+Each `_sim` package inherits from its `_mock` package (`based_on_package`) and sets the mock's `ros2_control_xacro` argument to its own MuJoCo hardware.
 `fr3_solo_sim` changes only the hardware.
 Real-hardware (`_hw`) configurations are not part of this workspace yet; [issue #10](https://github.com/PickNikRobotics/moveit_pro_franka_ws/issues/10) tracks them.
 

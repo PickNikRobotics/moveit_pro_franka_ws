@@ -3,7 +3,7 @@
 MoveIt Pro MuJoCo simulation configuration for one Franka Research 3 (FR3) arm with a Franka Hand.
 The scene holds the robot only: a floor and a light, no environment.
 
-It inherits everything from `fr3_solo_mock` (robot description, SRDF, MoveIt parameters, controllers, Objectives and waypoints) and changes only the ros2_control hardware to MuJoCo, through the `hardware_interface` xacro argument.
+It inherits everything from `fr3_solo_mock` (robot description, SRDF, MoveIt parameters, controllers, Objectives and waypoints) and changes only the ros2_control hardware to MuJoCo, through the mock's `ros2_control_xacro` xacro argument.
 
 ## Build and run
 

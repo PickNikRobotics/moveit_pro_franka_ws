@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- fr3_solo_sim sets these through urdf_params. -->
+  <xacro:arg name="mujoco_model" default="mjcf/scene.xml" />
+  <xacro:arg name="mujoco_viewer" default="false" />
+
   <xacro:macro name="fr3_solo_mujoco_joint" params="name lower upper initial_position:=0.0">
     <joint name="${name}">
       <command_interface name="position">
@@ -50,4 +54,7 @@
       <xacro:fr3_solo_mujoco_joint name="fr3_finger_joint1" lower="0.0" upper="0.04" />
     </ros2_control>
   </xacro:macro>
+
+  <!-- Included through the mock's ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:fr3_solo_mujoco_ros2_control mujoco_model="$(arg mujoco_model)" mujoco_viewer="$(arg mujoco_viewer)" />
 </robot>
