@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'The picknikciuser/moveit-pro tag to test against, without the distro (e.g. 10.1.0)'
+        required: false
+        default: ''
+  # Run every 6 hours Mon-Fri
+  schedule:
+    - cron: "0 */6 * * 1-5"
+
+jobs:
+  integration-test-in-studio-container:
+    # v0.10.0 has the same workflow as v0.9.1, the first release that gives the container a license hardware identity.
+    uses: PickNikRobotics/moveit_pro_ci/.github/workflows/workspace_integration_test.yaml@9ad6957ce0a9cfc8af294824e6d6593b053bbfb5 # v0.10.0
+    permissions:
+      contents: read
+    with:
+      image_tag: ${{ github.event.inputs.image_tag || '10.1.0' }}
+      # The default picknikciuser/moveit-studio image has no 10.1.0 tag, so name the moveit-pro image.
+      image_ref: picknikciuser/moveit-pro:${{ github.event.inputs.image_tag || '10.1.0' }}-{0}
+      ros_distros: '["jazzy"]'
+      colcon_test_args: "--executor sequential"
+      runner: ubuntu-24.04
+    secrets:
+      moveit_license_key: ${{ secrets.STUDIO_CI_LICENSE_KEY }}
+
+  ensure-no-ssh-in-gitmodules:
+    name: Ensure no SSH URLs in .gitmodules
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check .gitmodules file for Git-over-SSH URLs
+        run: "! grep 'git@' .gitmodules"

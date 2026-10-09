@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="franka">
+  <!-- The ros2_control hardware file: this package's mock hardware unless a config sets another through urdf_params. -->
+  <xacro:arg
+    name="ros2_control_xacro"
+    default="$(find fr3_solo_mock)/description/fr3_solo_mock.ros2_control.xacro"
+  />
+  <xacro:arg name="ee_id" default="franka_hand" />
+  <xacro:arg name="rpy_ee" default="0 0 -0.785" />
+
+  <!-- franka_description 2.9.0 loads the FR3 limits, inertials, kinematics and dynamics itself. -->
+  <xacro:include filename="$(find franka_description)/robots/common/franka_robot.xacro" />
+  <xacro:franka_robot
+    robot_type="fr3"
+    hand="true"
+    tcp_xyz="0 0 0.1034"
+    ee_id="$(arg ee_id)"
+    rpy_ee="$(arg rpy_ee)"
+    with_sc="false"
+    no_prefix="false"
+    arm_prefix=""
+    connected_to="world"
+  />
+
+  <!-- Aligns the grasp frame axes with the MoveIt Pro motion planning convention. -->
+  <link name="grasp_link" />
+  <joint name="grasp_link_joint" type="fixed">
+    <parent link="fr3_hand_tcp" />
+    <child link="grasp_link" />
+    <origin xyz="0 0 0" rpy="0 0 ${-pi/2}" />
+  </joint>
+
+  <xacro:include filename="$(arg ros2_control_xacro)" />
+</robot>
