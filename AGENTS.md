@@ -5,7 +5,7 @@ MoveIt Pro 10.1.0+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md`
 ## Layout and inheritance
 
 - Each robot has `src/<robot>_mock` (mock hardware) and `src/<robot>_sim` (MuJoCo). The sim config sets `based_on_package: <robot>_mock` and, through `urdf_params`, points the mock URDF's `ros2_control_xacro` argument at its own MuJoCo `ros2_control` file, which declares the MuJoCo arguments. A mock never refers to its sim. Change the description in the mock package only.
-- There are no `_hw` packages yet.
+- There are no `_hw` packages yet (issue #10).
 
 ## Conventions
 
