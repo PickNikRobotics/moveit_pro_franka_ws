@@ -13,6 +13,6 @@ Neither moves the robot: the Objectives "Move Spine Absolute" and "Move Spine to
 
 The package builds on MoveIt Pro 10.1.0 and later. Tests: `colcon test --packages-select franka_behaviors`.
 
-## Real-hardware Behaviors (not built)
+## Real-hardware Behaviors
 
-`hardware/` holds Behaviors for the real FR3: `FrankaGraspAction`, `FrankaSetForceTorqueCollisionBehavior` and `FrankaSetFullCollisionBehavior`. They call the `franka_msgs` actions and services of franka_ros2, which this workspace does not include, so they are not compiled or installed. Real-hardware support will need franka_ros2 and a port of these files.
+The real-hardware Behaviors (`FrankaGraspAction`, `FrankaSetForceTorqueCollisionBehavior`, `FrankaSetFullCollisionBehavior`) need franka_ros2. They return with the `_hw` configurations, tracked in [issue #10](https://github.com/PickNikRobotics/moveit_pro_franka_ws/issues/10).

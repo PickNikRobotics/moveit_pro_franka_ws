@@ -10,7 +10,7 @@ foreach(package IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${package} REQUIRED)
 endforeach()
 
-# The spine Behaviors. The real-hardware Behaviors in hardware/ need franka_msgs and are not built.
+# The spine Behaviors.
 add_library(franka_behaviors SHARED src/create_spine_state.cpp src/get_spine_state_for_pose_height.cpp
                                     src/register_behaviors.cpp)
 target_include_directories(franka_behaviors PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
