@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- fr3_duo_spine_sim sets these through urdf_params. -->
+  <xacro:arg name="mujoco_model" default="mjcf/scene.xml"/>
+  <xacro:arg name="mujoco_viewer" default="false"/>
+
   <!-- MujocoSystem takes the joints and actuators from the MJCF, so none are listed here. -->
   <xacro:macro name="fr3_duo_mujoco_ros2_control" params="mujoco_model mujoco_viewer">
     <ros2_control name="fr3_duo" type="system">
@@ -15,4 +19,7 @@
       </hardware>
     </ros2_control>
   </xacro:macro>
+
+  <!-- Included through the mock's ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:fr3_duo_mujoco_ros2_control mujoco_model="$(arg mujoco_model)" mujoco_viewer="$(arg mujoco_viewer)"/>
 </robot>
