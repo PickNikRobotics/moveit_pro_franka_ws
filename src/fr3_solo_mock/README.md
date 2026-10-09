@@ -2,7 +2,7 @@
 
 MoveIt Pro configuration for one Franka Research 3 (FR3) arm with a Franka Hand on mock hardware (`mock_components/GenericSystem`): no physics simulation and no driver.
 
-It is also the parent configuration for single-arm FR3 configurations: `fr3_solo_sim` and the example workspace's `kitchen_sim` inherit its SRDF and MoveIt parameters through `based_on_package`.
+The robot xacro takes its ros2_control hardware from the `ros2_control_xacro` argument, which defaults to this package's mock hardware. `fr3_solo_sim` inherits this configuration through `based_on_package` and sets that argument to its MuJoCo hardware.
 
 ## Build and run
 
@@ -33,4 +33,4 @@ moveit_pro run -c fr3_solo_mock
 | `velocity_force_controller` | `velocity_force_controller/VelocityForceController` | inactive |
 | `joint_velocity_controller` | `joint_velocity_controller/JointVelocityController` | inactive |
 
-The robot and SRDF are named `franka`, and the joint names are the franka_description FR3 names (`fr3_joint1` to `fr3_joint7`, `fr3_finger_joint1`). A configuration that reuses this SRDF must keep both.
+The robot and SRDF are named `franka`, and the joint names are the franka_description FR3 names (`fr3_joint1` to `fr3_joint7`, `fr3_finger_joint1`).

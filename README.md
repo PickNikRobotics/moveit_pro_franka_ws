@@ -36,10 +36,9 @@ The whole-body group of each robot keeps the standard MoveIt Pro controller name
 Controllers for part of a robot use short names: `jtac` (JointTrajectoryAdmittanceController), `jtc` (JointTrajectoryController), `vfc` (VelocityForceController), `jvc` (JointVelocityController) and `jgvc` (JointGroupVelocityController).
 `left_` and `right_` mean one arm, the `_w_spine` suffix adds the spine, and `spine_` and `base_` name those groups. Each package README lists its controllers.
 
-## Use from another workspace
+## Make your own configuration
 
-The packages are laid out so that another workspace, such as [moveit_pro_example_ws](https://github.com/PickNikRobotics/moveit_pro_example_ws), can take them in as a vendored copy under its `src/external_dependencies/` and build its own configurations on them with `based_on_package`.
-Such a copy leaves out this workspace's submodules, so the consuming workspace provides franka_description itself, at the same release.
+To make your own configuration, copy a package and rename it.
 
 ## License
 

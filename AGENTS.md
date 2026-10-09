@@ -4,13 +4,8 @@ MoveIt Pro 10.1.0+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md`
 
 ## Layout and inheritance
 
-- Each robot has `src/<robot>_mock` (mock hardware) and `src/<robot>_sim` (MuJoCo). The sim config sets `based_on_package: <robot>_mock` and overrides the `hardware_interface` xacro argument (plus MuJoCo arguments). The mock URDF xacro then includes the sim package's MuJoCo `ros2_control` macro. Change the description in the mock package only.
+- Each robot has `src/<robot>_mock` (mock hardware) and `src/<robot>_sim` (MuJoCo). The sim config sets `based_on_package: <robot>_mock` and, through `urdf_params`, points the mock URDF's `ros2_control_xacro` argument at its own MuJoCo `ros2_control` file, which declares the MuJoCo arguments. A mock never refers to its sim. Change the description in the mock package only.
 - There are no `_hw` packages yet.
-
-## moveit_pro_example_ws depends on this repository
-
-- moveit_pro_example_ws vendors these packages under `src/external_dependencies/moveit_pro_franka_ws/` (an `UPSTREAM.yaml` pinned to a commit of this repository). It does not take this repository's own submodules, and it carries its own vendored franka_description. Keep the submodule `src/external_dependencies/franka_description` at the same release as that copy, and never make a package need, at build time, a file that exists only in this repository's submodules.
-- `fr3_solo_mock` is the parent of example_ws `kitchen_sim`, which reuses its SRDF and MoveIt parameters. Keep the robot and SRDF name `franka`, the `fr3_*` joint names, the `manipulator` group, the long controller names in `config/moveit/*_jog.yaml`, and the file names `objectives/close_gripper.xml` and `open_gripper.xml`. MoveIt Pro resolves same-named Objective files leaf-first by file name, so a child's file with the same name overrides the parent's.
 
 ## Conventions
 
