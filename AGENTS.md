@@ -15,7 +15,7 @@ MoveIt Pro 10.1.0+ (ROS 2 Jazzy) config workspace for Franka robots. `README.md`
 
 ## Checking changes without a robot
 
-CI (`.github/workflows/`) builds and runs `colcon test` in `picknikciuser/moveit-pro:10.1.0-jazzy`, and its Format job runs the hooks in `.pre-commit-config.yaml`: run `pre-commit run -a` before you push.
+CI (`.github/workflows/ci.yaml`) calls the shared `moveit_pro_ci` workspace integration test, which builds and runs `colcon test` in `picknikciuser/moveit-pro:10.1.0-jazzy`. The Format job runs the hooks in `.pre-commit-config.yaml`, with `.prettierrc.cjs` for XML and `.clang-format` for C++: run `pre-commit run -a` before you push.
 
 Build and load every config inside a MoveIt Pro image. Mount the workspace and the franka_description checkout. Run `colcon build` with an out-of-tree `--build-base`/`--install-base`, then construct `moveit_studio_utils_py.system_config.SystemConfigParser()` with `MOVEIT_CONFIG_PACKAGE=<package>` and `USER_WS` set. This runs the real config merge, schema checks and URDF/SRDF xacro. Source `/opt/overlay_ws/install/setup.bash` and use `--entrypoint bash`.
 
