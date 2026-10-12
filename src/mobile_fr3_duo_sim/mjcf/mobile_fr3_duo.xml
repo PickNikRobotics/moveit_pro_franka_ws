@@ -1,4 +1,6 @@
 <?xml version="1.0" ?>
+<!-- Derived from the MuJoCo Menagerie Franka FR3 model (franka_fr3), licensed under the
+     Apache License, Version 2.0 (LICENSE in this directory). Modified by PickNik Inc., 2026. -->
 <mujoco model="mobile_fr3_duo">
   <compiler angle="radian" meshdir="assets" />
   <size nuser_cam="4" />
