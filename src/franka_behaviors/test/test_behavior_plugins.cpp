@@ -48,7 +48,8 @@ TEST(BehaviorTests, LoadBehaviorPlugins)
     ASSERT_NO_THROW(plugin_instance->registerBehaviors(factory, shared_resources));
   }
 
-  for (const auto* id : { "CreateSpineState", "GetSpineStateForPoseHeight" })
+  for (const auto* id : { "CreateSpineState", "GetSpineStateForPoseHeight", "FrankaErrorRecovery", "FrankaGraspAction",
+                          "SetHardwareComponentState" })
   {
     EXPECT_NO_THROW((void)factory.instantiateTreeNode("test_behavior_name", id, BT::NodeConfiguration())) << id;
   }
