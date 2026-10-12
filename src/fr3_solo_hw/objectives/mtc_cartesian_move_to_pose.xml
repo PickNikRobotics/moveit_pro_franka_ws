@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="MTC Cartesian Move to Pose">
+  <BehaviorTree
+    ID="MTC Cartesian Move to Pose"
+    _description="Plan a Cartesian path of the tip link to one pose and execute it on the joint trajectory controller."
+  >
+    <Control ID="Sequence" name="root">
+      <Action ID="ResetPoseStampedVector" vector="{pose_vector}" />
+      <Action
+        ID="AddPoseStampedToVector"
+        input="{target_pose}"
+        vector="{pose_vector}"
+      />
+      <SubTree
+        ID="MTC Cartesian Move to Poses"
+        _collapsed="true"
+        target_poses="{pose_vector}"
+        planning_group_name="{planning_group_name}"
+        tip_link="{tip_link}"
+        velocity_scale_factor="{velocity_scale_factor}"
+        acceleration_scale_factor="{acceleration_scale_factor}"
+        require_approval="{require_approval}"
+        controller_names="{controller_names}"
+        controller_action_name="{controller_action_name}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="MTC Cartesian Move to Pose">
+      <MetadataFields>
+        <Metadata subcategory="Motion - Execute" />
+        <Metadata runnable="false" />
+      </MetadataFields>
+      <inout_port
+        name="target_pose"
+        default="{target_pose}"
+        type="geometry_msgs::msg::PoseStamped"
+      />
+      <inout_port
+        name="planning_group_name"
+        default="manipulator"
+        type="std::string"
+      />
+      <inout_port name="tip_link" default="grasp_link" type="std::string" />
+      <inout_port name="velocity_scale_factor" default="1.0" type="double" />
+      <inout_port
+        name="acceleration_scale_factor"
+        default="1.0"
+        type="double"
+      />
+      <inout_port name="require_approval" default="false" type="bool" />
+      <inout_port
+        name="controller_names"
+        default="joint_trajectory_controller"
+        type="std::string"
+      />
+      <inout_port
+        name="controller_action_name"
+        default="/joint_trajectory_controller/follow_joint_trajectory"
+        type="std::string"
+      />
+    </SubTree>
+  </TreeNodesModel>
+</root>

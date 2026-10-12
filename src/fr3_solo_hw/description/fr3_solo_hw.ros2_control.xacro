@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- fr3_solo_hw sets this through urdf_params. The default is the address in franka_ros2's own single-arm bringup. -->
+  <xacro:arg name="robot_ip" default="172.16.0.3" />
+
+  <xacro:include filename="$(find franka_hardware)/ros2_control/franka_arm.ros2_control.xacro" />
+  <xacro:include filename="$(find franka_hardware)/ros2_control/franka_arm_hardware_plugins.xacro" />
+
+  <!-- The real FR3 through FrankaHardwareInterface. Synchronous, as in franka_ros2's single-arm bringup. -->
+  <!-- The Franka Hand is not in this block: the franka_gripper node drives it. -->
+  <xacro:franka_arm_ros2_control
+    robot_type="fr3"
+    include_effort_command="true"
+    include_finger_joint="false"
+    arm_prefix=""
+    is_async="false"
+  >
+    <hardware_plugin>
+      <xacro:franka_real_hardware_plugin robot_ip="$(arg robot_ip)" arm_prefix="" />
+    </hardware_plugin>
+  </xacro:franka_arm_ros2_control>
+</robot>
