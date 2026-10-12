@@ -1,0 +1,14 @@
+# Everything not set here comes from fr3_duo_spine_mock: description, SRDF, MoveIt
+# parameters, controllers, Objectives (including the MuJoCo ones) and waypoints.
+based_on_package: fr3_duo_spine_mock
+
+hardware:
+  robot_description:
+    # Overrides only these xacro arguments; the other inherited ones stay.
+    urdf_params:
+      # The MuJoCo ros2_control hardware, in place of fr3_duo_spine_mock's mock hardware.
+      - ros2_control_xacro:
+          package: "fr3_duo_spine_sim"
+          path: "description/fr3_duo_mujoco.ros2_control.xacro"
+      - mujoco_model: "mjcf/scene.xml"
+      - mujoco_viewer: "False"

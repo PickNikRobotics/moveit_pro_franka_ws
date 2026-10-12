@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- fr3_duo_sim sets these through urdf_params. -->
+  <xacro:arg name="mujoco_model" default="mjcf/scene.xml"/>
+  <xacro:arg name="mujoco_viewer" default="false"/>
+
+  <!-- MujocoSystem takes the joints and actuators from the MJCF, so none are listed here. -->
+  <xacro:macro name="fr3_duo_mujoco_ros2_control" params="mujoco_model mujoco_viewer">
+    <ros2_control name="fr3_duo" type="system">
+      <hardware>
+        <plugin>picknik_mujoco_ros/MujocoSystem</plugin>
+        <param name="mujoco_model">${mujoco_model}</param>
+        <param name="mujoco_model_package">fr3_duo_sim</param>
+        <param name="mujoco_viewer">${mujoco_viewer}</param>
+        <param name="mujoco_keyframe">default</param>
+        <!-- Required by MujocoSystem; the scene has no cameras, so nothing is rendered. -->
+        <param name="render_publish_rate">10</param>
+        <param name="tf_publish_rate">60</param>
+      </hardware>
+    </ros2_control>
+  </xacro:macro>
+
+  <!-- Included through the mock's ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:fr3_duo_mujoco_ros2_control mujoco_model="$(arg mujoco_model)" mujoco_viewer="$(arg mujoco_viewer)"/>
+</robot>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- fr3_solo_sim sets these through urdf_params. -->
+  <xacro:arg name="mujoco_model" default="mjcf/scene.xml" />
+  <xacro:arg name="mujoco_viewer" default="false" />
+
+  <xacro:macro name="fr3_solo_mujoco_joint" params="name lower upper initial_position:=0.0">
+    <joint name="${name}">
+      <command_interface name="position">
+        <param name="min">${lower}</param>
+        <param name="max">${upper}</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">${initial_position}</param>
+      </state_interface>
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
+    </joint>
+  </xacro:macro>
+
+  <!-- Limits from franka_description, informational only: MujocoSystem builds its interfaces and limits from the MJCF. -->
+  <xacro:property name="fr3_solo_joint_limits" value="${xacro.load_yaml('$(find franka_description)/robots/fr3/joint_limits.yaml')}" />
+  <xacro:property name="fr3_solo_ready_pose" value="${[0.0, -pi/4, 0.0, -3*pi/4, 0.0, pi/2, pi/4]}" />
+  <xacro:macro name="fr3_solo_mujoco_arm_joint" params="index">
+    <xacro:fr3_solo_mujoco_joint
+      name="fr3_joint${index}"
+      lower="${fr3_solo_joint_limits['joint' + str(index)]['limit']['lower']}"
+      upper="${fr3_solo_joint_limits['joint' + str(index)]['limit']['upper']}"
+      initial_position="${fr3_solo_ready_pose[index - 1]}"
+    />
+  </xacro:macro>
+
+  <xacro:macro name="fr3_solo_mujoco_ros2_control" params="mujoco_model mujoco_viewer">
+    <ros2_control name="fr3_solo" type="system">
+      <hardware>
+        <plugin>picknik_mujoco_ros/MujocoSystem</plugin>
+        <param name="mujoco_model">${mujoco_model}</param>
+        <param name="mujoco_model_package">fr3_solo_sim</param>
+        <param name="mujoco_viewer">${mujoco_viewer}</param>
+        <param name="mujoco_keyframe">default</param>
+        <!-- Required by MujocoSystem; the scene has no cameras, so nothing is rendered. -->
+        <param name="render_publish_rate">10</param>
+        <param name="tf_publish_rate">60</param>
+      </hardware>
+
+      <xacro:fr3_solo_mujoco_arm_joint index="1" />
+      <xacro:fr3_solo_mujoco_arm_joint index="2" />
+      <xacro:fr3_solo_mujoco_arm_joint index="3" />
+      <xacro:fr3_solo_mujoco_arm_joint index="4" />
+      <xacro:fr3_solo_mujoco_arm_joint index="5" />
+      <xacro:fr3_solo_mujoco_arm_joint index="6" />
+      <xacro:fr3_solo_mujoco_arm_joint index="7" />
+      <!-- Finger range: the slide range of the finger joints in mjcf/fr3_solo.xml. -->
+      <xacro:fr3_solo_mujoco_joint name="fr3_finger_joint1" lower="0.0" upper="0.04" />
+    </ros2_control>
+  </xacro:macro>
+
+  <!-- Included through the mock's ros2_control_xacro argument, so the file adds its own block. -->
+  <xacro:fr3_solo_mujoco_ros2_control mujoco_model="$(arg mujoco_model)" mujoco_viewer="$(arg mujoco_viewer)" />
+</robot>

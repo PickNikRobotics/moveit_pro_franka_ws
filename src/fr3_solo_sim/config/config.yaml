@@ -1,0 +1,20 @@
+###############################################################
+#
+#  This configures the robot to work with MoveIt Pro
+#
+###############################################################
+
+# Everything not set here comes from fr3_solo_mock: description, SRDF,
+# MoveIt parameters, controllers, Objectives and waypoints.
+based_on_package: "fr3_solo_mock"
+
+hardware:
+  robot_description:
+    # Overrides only these xacro arguments; the other inherited ones stay.
+    urdf_params:
+      # The MuJoCo ros2_control hardware, in place of fr3_solo_mock's mock hardware.
+      - ros2_control_xacro:
+          package: "fr3_solo_sim"
+          path: "description/fr3_solo_mujoco.ros2_control.xacro"
+      - mujoco_model: "mjcf/scene.xml"
+      - mujoco_viewer: "False"
