@@ -18,6 +18,10 @@ controller_manager:
       type: velocity_force_controller/VelocityForceController
     base_jgvc:
       type: velocity_controllers/JointGroupVelocityController
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    base_pid:
+      type: pid_controller/PidController
     joint_trajectory_admittance_controller:
       type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
     left_jtac_w_spine:
@@ -90,6 +94,77 @@ base_jgvc:
       - planar_x
       - planar_y
       - planar_theta
+
+# Whole-body trajectories (whole_body and the *_manipulator_with_base groups). The planar joints go
+# through base_pid; the whole-body Objectives switch both in, then JTAC and base_jgvc back.
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - planar_x
+      - planar_y
+      - planar_theta
+      - franka_spine_vertical_joint
+      - left_fr3v2_joint1
+      - left_fr3v2_joint2
+      - left_fr3v2_joint3
+      - left_fr3v2_joint4
+      - left_fr3v2_joint5
+      - left_fr3v2_joint6
+      - left_fr3v2_joint7
+      - right_fr3v2_joint1
+      - right_fr3v2_joint2
+      - right_fr3v2_joint3
+      - right_fr3v2_joint4
+      - right_fr3v2_joint5
+      - right_fr3v2_joint6
+      - right_fr3v2_joint7
+    command_joints:
+      - base_pid/planar_x
+      - base_pid/planar_y
+      - base_pid/planar_theta
+      - franka_spine_vertical_joint
+      - left_fr3v2_joint1
+      - left_fr3v2_joint2
+      - left_fr3v2_joint3
+      - left_fr3v2_joint4
+      - left_fr3v2_joint5
+      - left_fr3v2_joint6
+      - left_fr3v2_joint7
+      - right_fr3v2_joint1
+      - right_fr3v2_joint2
+      - right_fr3v2_joint3
+      - right_fr3v2_joint4
+      - right_fr3v2_joint5
+      - right_fr3v2_joint6
+      - right_fr3v2_joint7
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_partial_joints_goal: true
+    constraints:
+      stopped_velocity_tolerance: 0.0
+      goal_time: 0.0
+      planar_x: {goal: 0.02}
+      planar_y: {goal: 0.02}
+      planar_theta: {goal: 0.02}
+
+# Chained under joint_trajectory_controller: turns its planar position references into the
+# planar velocity commands that base_jgvc otherwise sends for Nav2.
+base_pid:
+  ros__parameters:
+    dof_names:
+      - planar_x
+      - planar_y
+      - planar_theta
+    command_interface: velocity
+    reference_and_state_interfaces:
+      - position
+    gains:
+      planar_x: {p: 6.0, i: 0.0, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5}
+      planar_y: {p: 6.0, i: 0.0, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5}
+      planar_theta: {p: 6.0, i: 0.0, d: 0.0, u_clamp_max: 0.7, u_clamp_min: -0.7, angle_wraparound: true}
 
 joint_trajectory_admittance_controller:
   ros__parameters:

@@ -42,12 +42,11 @@ def generate_launch_description():
         output="log",
     )
 
-    # The only publisher of the planar joints (odom -> base_link) and of /odom for
-    # Nav2: the simulator's true base pose with drift added, so AMCL has a real
-    # correction to make. odometry_drift:=false makes the odometry exact.
+    # The only publisher of the planar joints (odom -> base_link) and of /odom. Exact by
+    # default, so whole-body plans and their execution agree; odometry_drift:=true adds drift.
     odometry_drift = DeclareLaunchArgument(
         "odometry_drift",
-        default_value="true",
+        default_value="false",
         description="Add drift to the simulated odometry.",
     )
     odometry = Node(

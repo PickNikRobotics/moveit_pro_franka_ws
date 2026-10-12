@@ -24,6 +24,19 @@
         <joint name="planar_y"/>
         <joint name="planar_theta"/>
     </group>
+    <!-- Base, spine and arms as one mechanism, run by joint_trajectory_controller. -->
+    <group name="whole_body">
+        <group name="mobile_base"/>
+        <group name="manipulator"/>
+    </group>
+    <group name="left_manipulator_with_base">
+        <group name="mobile_base"/>
+        <group name="left_manipulator"/>
+    </group>
+    <group name="right_manipulator_with_base">
+        <group name="mobile_base"/>
+        <group name="right_manipulator"/>
+    </group>
     <!-- base_link is the end effector of mobile_base: it gives the base its teleop iMarker. -->
     <group name="base">
         <link name="base_link"/>
