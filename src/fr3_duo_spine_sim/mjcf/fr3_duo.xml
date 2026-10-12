@@ -1,5 +1,7 @@
-<!-- Derived from the MuJoCo Menagerie Franka FR3 model (franka_fr3), licensed under the
-     Apache License, Version 2.0 (LICENSE in this directory). Modified by PickNik Inc., 2026. -->
+<!-- Converted from franka_description 2.9.0 (Copyright 2023 Franka Robotics GmbH, Apache License,
+     Version 2.0; LICENSES/franka_description-LICENSE), with actuator settings from the MuJoCo Menagerie
+     Franka FR3 model (franka_fr3) and finger coupling from its Franka Emika Panda hand.xml (Apache
+     License, Version 2.0; LICENSE in this directory). Modified by PickNik Inc., 2026. -->
 <mujoco model="fr3_duo">
   <compiler angle="radian" meshdir="assets" />
   <option integrator="implicitfast">

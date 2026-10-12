@@ -18,6 +18,11 @@ Third-party files:
     finger_1.obj, are copied unchanged, except tmrv0_2_visual.stl, which
     PickNik Inc. converted from franka_description's
     meshes/robots/tmrv0_2/visual/tmrv0_2.dae.
+  - src/fr3_duo_spine_sim/mjcf/fr3_duo.xml and
+    src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml are converted by PickNik Inc.
+    from its robot descriptions (kinematics, inertials and dynamics of the FR3
+    v2, spine, head and TMR base), with the Menagerie parts listed below; each
+    file says so in a comment at its top.
 
 - MuJoCo Menagerie Franka FR3 model (franka_fr3)
   Licensed under the Apache License, Version 2.0. Its LICENSE file, which also
@@ -25,11 +30,11 @@ Third-party files:
   each mjcf/ directory listed here.
   - The arm meshes in src/fr3_solo_sim/mjcf/assets/ and
     src/fr3_duo_sim/mjcf/assets/ are copied unchanged.
-  - src/fr3_solo_sim/mjcf/fr3_solo.xml, src/fr3_duo_sim/mjcf/fr3_duo.xml,
-    src/fr3_duo_spine_sim/mjcf/fr3_duo.xml and
-    src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml are derived from the
-    model's fr3.xml and modified by PickNik Inc.; each file says so in a
-    comment at its top.
+  - src/fr3_solo_sim/mjcf/fr3_solo.xml and src/fr3_duo_sim/mjcf/fr3_duo.xml are
+    derived from the model's fr3.xml and modified by PickNik Inc.; each file
+    says so in a comment at its top.
+  - The actuator settings in src/fr3_duo_spine_sim/mjcf/fr3_duo.xml and
+    src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml come from the model's fr3.xml.
 
 - MuJoCo Menagerie Franka Emika Panda model (franka_emika_panda), for the
   Franka Hand
@@ -41,3 +46,6 @@ Third-party files:
   - finger_0.obj and finger_1.obj in src/fr3_duo_spine_sim/mjcf/assets/ and
     src/mobile_fr3_duo_sim/mjcf/assets/ are copied unchanged
     (LICENSE-mujoco_menagerie next to them).
+  - The finger coupling (tendon and equality constraints) in
+    src/fr3_duo_spine_sim/mjcf/fr3_duo.xml and
+    src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml comes from the model's hand.xml.
