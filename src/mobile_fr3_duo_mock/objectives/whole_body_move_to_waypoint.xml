@@ -6,6 +6,8 @@
     _favorite="true"
   >
     <Control ID="Sequence">
+      <!-- RetrieveWaypoint in MoveIt Pro 10.2 reads joint_group_name from the blackboard; 10.1.0 ignores it. -->
+      <Action ID="Script" code="joint_group_name := 'whole_body'" />
       <Action
         ID="RetrieveWaypoint"
         waypoint_name="{waypoint_name}"
