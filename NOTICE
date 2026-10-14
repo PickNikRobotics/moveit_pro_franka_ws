@@ -27,8 +27,10 @@ Third-party files:
 - franka_ros2 3.6.0
   Copyright 2023 Franka Robotics GmbH
   Licensed under the Apache License, Version 2.0. Its LICENSE file is copied
-  unchanged to LICENSES/franka_ros2-LICENSE. Values copied from it, each named
-  in a comment where it is used:
+  unchanged to LICENSES/franka_ros2-LICENSE. The submodule pins PickNik's fork,
+  which is 3.6.0 plus two franka_hardware fixes; the files named below are
+  unchanged from 3.6.0. Values copied from it, each named in a comment where it
+  is used:
   - The effort gains in src/fr3_solo_hw/config/control/ come from
     franka_fr3_moveit_config/config/fr3_ros_controllers.yaml.
   - The joint accelerations in src/fr3_solo_hw/config/moveit/joint_limits.yaml
@@ -70,8 +72,11 @@ LICENSE and NOTICE files:
 
 - src/external_dependencies/franka_description: franka_description 2.9.0,
   Copyright 2023 Franka Robotics GmbH, Apache License, Version 2.0.
-- src/external_dependencies/franka_ros2: franka_ros2 3.6.0, Copyright 2023
-  Franka Robotics GmbH, Apache License, Version 2.0.
+- src/external_dependencies/franka_ros2: franka_ros2 3.6.0 with two
+  franka_hardware fixes, from PickNik's fork
+  (https://github.com/PickNikRoboticsServices/franka_ros2, branch
+  fix/v3.6.0-activation-error-recovery). Copyright 2023 Franka Robotics GmbH,
+  Apache License, Version 2.0.
 - src/external_dependencies/libfranka: libfranka 0.20.5, Copyright 2023 Franka
   Robotics GmbH, Apache License, Version 2.0, with its common submodule
   (Copyright 2024 Franka Robotics GmbH, Apache License, Version 2.0).

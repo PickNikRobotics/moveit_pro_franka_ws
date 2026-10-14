@@ -4,6 +4,14 @@ The detail behind short code comments: why a setting is what it is, and where a 
 Organized by file, then by line, so an entry is findable from a code location.
 Keep entries short. When you change the code an entry describes, change the entry in the same commit.
 
+## .gitmodules
+
+### the franka_ros2 pin
+PickNik's fork of franka_ros2, branch `fix/v3.6.0-activation-error-recovery`: upstream v3.6.0 plus two franka_hardware commits.
+- `read()` and `write()` try the control lock and skip the cycle while a mode switch holds it, instead of waiting for it.
+- `on_activate()` tries one automatic error recovery before it refuses to activate on a reflex or error.
+Upstream v3.6.0 has neither. Only `franka_hardware_interface.cpp` and its test differ from v3.6.0, so the "v3.6.0" citations in this file hold for the pin.
+
 ## colcon-defaults.yaml
 
 ### L16 `packages-ignore`
@@ -47,7 +55,7 @@ The mock's `mujoco_objectives` entry holds "Reset MuJoCo Sim", which needs `Mujo
 The merged map keeps an inherited key at its old position, and only a new key goes to the end. MoveIt Pro copies the libraries from last to first and skips a file name it already has, so `fr3_solo_hw_objectives` must be a new key to win over the mock's `open_gripper.xml` and `close_gripper.xml` and core `teleoperate.xml`. Seen on MP10: with only the re-pointed `mujoco_objectives` key, "Open Gripper" ran the mock's file. The last library is also where the UI saves new Objectives.
 
 ### L61-L62 broadcasters only at startup
-franka_hardware changes the arm's control mode when a controller that claims command interfaces activates. That switch stops the robot and starts the new mode with blocking calls to the control box, inside the controller manager's update loop, so the loop misses cycles.
+franka_hardware changes the arm's control mode when a controller that claims command interfaces activates. That switch stops the robot and starts the new mode with blocking calls to the control box. With `activate_asap: true`, the default of MoveIt Pro's `SwitchController`, ros2_control runs it inside the controller manager's update loop, so the loop misses cycles. The pinned franka_hardware's reads and writes skip cycles during a switch instead of waiting for it; that keeps the loop running only for a switch requested with `activate_asap: false`, which ros2_control runs outside the loop (`manage_switch()`, controller_manager 4.45).
 During bring-up that can trip the communication reflex. With only state broadcasters at startup, bring-up switches no mode; each Objective activates the controller it needs.
 
 ## src/fr3_solo_hw/config/control/fr3_solo_hw.ros2_control.yaml
@@ -62,7 +70,7 @@ ros2_control's default skips the cycles a long loop missed and re-phases. `manag
 `ros2_control_node` locks the process memory only when this is true or the kernel is real-time. A failure to lock is only a warning, so check the drivers log for "Unable to lock the memory".
 
 ### L15-L17 `shutdown_on_initial_state_failure`
-franka_hardware refuses to activate while the robot reports a reflex or an error. The default turns that refusal into the end of the controller manager. False keeps the node up with the arm inactive, so "Recover Arm" can clear the fault.
+While the robot reports a reflex or an error, the pinned franka_hardware first tries one automatic error recovery at activation, then refuses to activate if the fault remains. The default turns that refusal into the end of the controller manager. False keeps the node up with the arm inactive, so "Recover Arm" can clear the fault.
 
 ### L35 `update_rate` of the joint state broadcaster
 At the full loop rate the broadcaster floods `/joint_states`. The finger joints are not in this list: the franka_gripper node publishes them to `/joint_states`.

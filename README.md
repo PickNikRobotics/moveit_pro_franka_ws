@@ -19,7 +19,7 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | [`mobile_fr3_duo_sim`](src/mobile_fr3_duo_sim) | Mobile FR3 Duo | MuJoCo, with a room scene, lidars and Nav2 |
 | [`franka_behaviors`](src/franka_behaviors) | Franka Behaviors: the spine Behaviors (`CreateSpineState`, `GetSpineStateForPoseHeight`) and the real-hardware Behaviors (`FrankaErrorRecovery`, `SetHardwareComponentState`, `FrankaGraspAction`) | built with the workspace |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
-| [`external_dependencies/franka_ros2`](https://github.com/frankarobotics/franka_ros2) | Franka ROS 2 drivers; the workspace builds franka_msgs, franka_hardware, franka_gripper, franka_robot_state_broadcaster and franka_semantic_components | submodule, release v3.6.0 |
+| [`external_dependencies/franka_ros2`](https://github.com/PickNikRoboticsServices/franka_ros2/tree/fix/v3.6.0-activation-error-recovery) | Franka ROS 2 drivers; the workspace builds franka_msgs, franka_hardware, franka_gripper, franka_robot_state_broadcaster and franka_semantic_components | submodule, PickNik's fork: upstream v3.6.0 plus two franka_hardware fixes (branch `fix/v3.6.0-activation-error-recovery`) |
 | [`external_dependencies/libfranka`](https://github.com/frankarobotics/libfranka) | Franka control library, used by franka_ros2 | submodule, release 0.20.5 |
 
 Each `_sim` package inherits from its `_mock` package (`based_on_package`) and sets the mock's `ros2_control_xacro` argument to its own MuJoCo hardware.

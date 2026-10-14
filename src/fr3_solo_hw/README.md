@@ -69,7 +69,8 @@ After a reflex (for example a collision), run Recover Arm before the next motion
 
 ## Known limitations
 
-- Each switch between controllers that command the arm in different modes (for example from `joint_trajectory_controller` to `joint_velocity_controller` for jogging) stalls the 1 kHz control loop once, while the arm changes its control mode.
+- A switch between controllers that command the arm in different modes (for example from `joint_trajectory_controller` to `joint_velocity_controller` for jogging) changes the arm's control mode with blocking calls to the control box. The pinned franka_hardware skips its reads and writes during the switch instead of waiting for it. The 1 kHz control loop still stalls once when the switch runs inside that loop, which is what MoveIt Pro's `SwitchController` asks for by default (`activate_asap: true`); a switch requested with `activate_asap: false` runs outside it.
+- When the arm reports a reflex or an error at activation (at startup, or in Recover Arm), franka_hardware first tries one automatic error recovery. The arm stays inactive only if that fails.
 - MoveIt Pro's core motion Objectives default to `joint_trajectory_admittance_controller`, which sends position commands. Prefer this package's Objectives, which use `joint_trajectory_controller`.
 - This configuration has no camera, the same as `fr3_solo_sim`.
 - The configuration is built and checked without an arm connected. Motion on a real FR3 is not yet tested.
