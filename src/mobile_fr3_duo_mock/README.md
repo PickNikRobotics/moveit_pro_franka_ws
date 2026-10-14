@@ -30,6 +30,19 @@ The base is holonomic (a swerve drive), so it can move sideways. The `mobile_bas
 
 The base also has a teleop iMarker: `base_link` is the end effector of `mobile_base` (SRDF), and PoseIK solves `mobile_base` (`config/moveit/pose_ik.yaml`). Drag it in x, y or yaw and release: the arms stow and Nav2 drives the base to the marker, within Nav2's goal tolerance. This starts at once, with no preview or approval prompt, even when the teleop asks for approval before it moves the other groups. z, roll and pitch drags have no IK solution, so the UI does not run them. This comes from `objectives/request_teleoperation.xml`, a copy of MoveIt Pro's core "Request Teleoperation" (10.1.0) whose iMarker branch sends `mobile_base` to Nav2; every other group runs the core "Move to Cartesian Pose". With `mobile_base` selected, the teleop also shows the end-effector Open and Close Gripper buttons; they run this package's gripper Objectives.
 
+## Whole-body motion
+
+The planning group `whole_body` holds the planar joints, the spine and both arms. `left_manipulator_with_base` and `right_manipulator_with_base` hold the planar joints, the spine and one arm; their pose IK costs make the base move only when the arm cannot reach (`config/moveit/pose_ik.yaml`).
+
+`body_jtc` executes these groups. Its planar joints are chained through `base_pid`, a `pid_controller/PidController` that turns their position references into the planar velocity commands `base_jgvc` sends for Nav2. The two pairs claim the same planar joints, so one runs at a time: the whole-body Objectives switch `base_pid` and `body_jtc` in, then `joint_trajectory_admittance_controller` and `base_jgvc` back, also when the motion fails. Arm-only motion keeps the admittance controller; whole-body motion has no force compliance and no time scaling.
+
+| Objective | What it does |
+| --- | --- |
+| "Whole Body Move to Waypoint" | moves the base, the spine and both arms together to a saved `whole_body` waypoint (`Whole Body Demo`, `Whole Body Home`) |
+| "Whole Body Move to Pose" | moves one gripper to a pose (a subtree), moving the base and the spine too when the arm cannot reach |
+| "Whole Body Reach Left" | reaches the left gripper sideways, past the arm's reach |
+| "Whole Body Move to Joint State" | the shared plan, switch, execute and switch-back step |
+
 ## Spine
 
 The spine joint (`franka_spine_vertical_joint`, group `spine`) moves through:
@@ -72,7 +85,7 @@ moveit_pro run -c mobile_fr3_duo_mock
 
 ## Controllers
 
-The whole upper body (`manipulator`: spine and both arms) keeps the standard controller name. Controllers for a part of the robot use short names: `jtac` (JointTrajectoryAdmittanceController), `jtc` (JointTrajectoryController), `vfc` (VelocityForceController), `jvc` (JointVelocityController), `jgvc` (JointGroupVelocityController). `left_`/`right_` is one arm; the `_w_spine` suffix adds the spine.
+The whole upper body (`manipulator`: spine and both arms) keeps the standard controller name. Controllers for a part of the robot use short names: `jtac` (JointTrajectoryAdmittanceController), `jtc` (JointTrajectoryController), `vfc` (VelocityForceController), `jvc` (JointVelocityController), `jgvc` (JointGroupVelocityController). `left_`/`right_` is one arm; the `_w_spine` suffix adds the spine. `body_jtc` drives the base, the spine and both arms together.
 
 | Controller | Type | Group | At startup |
 | --- | --- | --- | --- |
@@ -88,3 +101,5 @@ The whole upper body (`manipulator`: spine and both arms) keeps the standard con
 | `spine_jvc` | `joint_velocity_controller/JointVelocityController` | `spine` | inactive |
 | `base_jvc` | `joint_velocity_controller/JointVelocityController` | `mobile_base` | inactive |
 | `base_vfc` | `velocity_force_controller/VelocityForceController` | `mobile_base` | inactive |
+| `body_jtc` | `joint_trajectory_controller/JointTrajectoryController` | `whole_body`, `left_manipulator_with_base`, `right_manipulator_with_base` | inactive |
+| `base_pid` | `pid_controller/PidController` | planar joints, chained under `body_jtc` | inactive |

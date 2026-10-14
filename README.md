@@ -42,9 +42,9 @@ If you cloned without git-lfs, run `git lfs install` and `git lfs pull` first.
 
 ## Controller names
 
-The whole-body group of each robot keeps the standard MoveIt Pro controller names (`joint_trajectory_admittance_controller`, `joint_trajectory_controller`, `velocity_force_controller`, `joint_velocity_controller`).
+The `manipulator` group of each robot (its arms, and the spine where there is one) keeps the standard MoveIt Pro controller names (`joint_trajectory_admittance_controller`, `joint_trajectory_controller`, `velocity_force_controller`, `joint_velocity_controller`).
 Controllers for part of a robot use short names: `jtac` (JointTrajectoryAdmittanceController), `jtc` (JointTrajectoryController), `vfc` (VelocityForceController), `jvc` (JointVelocityController) and `jgvc` (JointGroupVelocityController).
-`left_` and `right_` mean one arm, the `_w_spine` suffix adds the spine, and `spine_` and `base_` name those groups. Each package README lists its controllers.
+`left_` and `right_` mean one arm, the `_w_spine` suffix adds the spine, and `spine_` and `base_` name those groups. `body_` is the Mobile FR3 Duo's base, spine and arms together (`body_jtc`). Each package README lists its controllers.
 
 ## Make your own configuration
 

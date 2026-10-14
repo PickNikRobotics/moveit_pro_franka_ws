@@ -37,3 +37,6 @@ ros2_control:
     - "right_jvc"
     - "base_jvc"
     - "base_vfc"
+    # The whole-body pair: switched in by the whole-body Objectives.
+    - "base_pid"
+    - "body_jtc"
