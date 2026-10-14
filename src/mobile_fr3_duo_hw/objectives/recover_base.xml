@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Recover Base">
+  <BehaviorTree
+    ID="Recover Base"
+    _description="Clear a fault on the base, then restore its hardware component and joint_state_broadcaster. Run Activate Mobile Base afterwards to drive again. Keep the arms still while it runs."
+    _favorite="true"
+  >
+    <SubTree
+      ID="Recover Franka Hardware"
+      _collapsed="true"
+      error_recovery_action="/action_server/error_recovery"
+      hardware_name="TmrHardware"
+      broadcasters="joint_state_broadcaster"
+      recovery_timeout="15.0"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Recover Base">
+      <MetadataFields>
+        <Metadata subcategory="Franka" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

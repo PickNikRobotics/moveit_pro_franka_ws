@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Stow Arms for Navigation">
+  <!-- Replaces mobile_fr3_duo_mock's file. Every navigation Objective runs this first, so it also activates the base. -->
+  <BehaviorTree
+    ID="Stow Arms for Navigation"
+    _description="Move each arm to the Stow waypoint, then activate the base controller so Nav2 can drive. The spine stays where it is."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <SubTree
+        ID="Move To Waypoint with Approval"
+        _collapsed="true"
+        waypoint_name="Stow"
+        joint_group_name="left_manipulator_without_spine"
+        cartesian_path_links="left_grasp_link"
+      />
+      <SubTree
+        ID="Move To Waypoint with Approval"
+        _collapsed="true"
+        waypoint_name="Stow"
+        joint_group_name="right_manipulator_without_spine"
+        cartesian_path_links="right_grasp_link"
+      />
+      <!-- The arms are still now, which is when the base's mode switch is safe. -->
+      <SubTree ID="Activate Mobile Base" _collapsed="true" />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Stow Arms for Navigation">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="Navigation" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

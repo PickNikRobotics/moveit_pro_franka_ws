@@ -31,15 +31,29 @@ Third-party files:
   which is 3.6.0 plus two franka_hardware fixes; the files named below are
   unchanged from 3.6.0. Values copied from it, each named in a comment where it
   is used:
-  - The effort gains in src/fr3_solo_hw/config/control/ come from
+  - The effort gains in src/fr3_solo_hw/config/control/ and
+    src/mobile_fr3_duo_hw/config/control/ come from
     franka_fr3_moveit_config/config/fr3_ros_controllers.yaml.
   - The joint accelerations in src/fr3_solo_hw/config/moveit/joint_limits.yaml
     come from franka_fr3_moveit_config/config/fr3_joint_limits.yaml.
-  - The default robot address of fr3_solo_hw comes from franka_bringup
-    (launch/franka.launch.py).
+  - The base speed and acceleration limits in
+    src/mobile_fr3_duo_hw/config/control/ come from
+    franka_bringup/config/controllers.yaml.
+  - The lidar and camera settings, addresses and USB ports in
+    src/mobile_fr3_duo_hw/config/drivers.yaml come from
+    franka_description_extensions/franka_mobile_sensors/config/
+    (default_sensor_suite.yaml, lidars/sick_nanoscan3.yaml,
+    cameras/franka_mobile_d455.yaml); the lidar scan frame's turn in
+    src/mobile_fr3_duo_hw/launch/robot_drivers_to_persist.launch.py comes from
+    its robots/nanoscan3 macro.
+  - The default robot addresses of fr3_solo_hw and mobile_fr3_duo_hw come from
+    franka_bringup (launch/franka.launch.py, config/mobile_fr3_duo.config.yaml)
+    and franka_spine/index.rst.
   - src/fr3_solo_hw/launch/robot_drivers_to_persist.launch.py starts the
-    franka_gripper node with the parameters that franka_ros2's own launch files
-    give it.
+    franka_gripper node, and
+    src/mobile_fr3_duo_hw/launch/robot_drivers_to_persist.launch.py the
+    franka_gripper, SICK and RealSense nodes, with the parameters that
+    franka_ros2's own launch files give them.
 
 - MuJoCo Menagerie Franka FR3 model (franka_fr3)
   Licensed under the Apache License, Version 2.0. Its LICENSE file, which also

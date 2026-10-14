@@ -1,0 +1,85 @@
+###############################################################
+#
+#  This configures the robot to work with MoveIt Pro
+#
+###############################################################
+
+# Everything not set here comes from mobile_fr3_duo_sim and mobile_fr3_duo_mock: description,
+# SRDF, kinematics, joint limits, waypoints. Why sim and not mock: docs/AGENT_COMMENTS.md.
+based_on_package: "mobile_fr3_duo_sim"
+
+hardware:
+  # Grippers, spine, base odometry, sensors and Nav2. They stay up for the whole run of the drivers container.
+  additional_driver_launch_file:
+    package: "mobile_fr3_duo_hw"
+    path: "launch/robot_drivers_to_persist.launch.py"
+  robot_description:
+    # Overrides only these xacro arguments; the other inherited ones stay.
+    urdf_params:
+      # The real arms and base through franka_hardware, in place of the MuJoCo hardware.
+      - ros2_control_xacro:
+          package: "mobile_fr3_duo_hw"
+          path: "description/mobile_fr3_duo_hw.ros2_control.xacro"
+      # Addresses of the two FR3 control boxes and the base. The Franka Hand drivers read these too.
+      - left_robot_ip: "172.16.16.12"
+      - right_robot_ip: "172.16.16.11"
+      - base_robot_ip: "172.16.16.10"
+
+moveit_params:
+  # One arm without the spine: the spine has no trajectory controller on the real robot.
+  joint_group_name: "left_manipulator_without_spine"
+  # Arms only: the base and the spine have no jog controllers on the real robot.
+  joint_jog:
+    package: "mobile_fr3_duo_hw"
+    path: "config/moveit/joint_jog.yaml"
+  pose_jog:
+    package: "mobile_fr3_duo_hw"
+    path: "config/moveit/pose_jog.yaml"
+
+objectives:
+  # Replaces the inherited list: the MuJoCo Behaviors have no use on the real robot.
+  behavior_loader_plugins:
+    core:
+      - "moveit_pro::behaviors::CoreBehaviorsLoader"
+      - "moveit_pro::behaviors::MTCCoreBehaviorsLoader"
+      - "moveit_pro::behaviors::VisionBehaviorsLoader"
+      - "moveit_pro::behaviors::MPCBehaviorsLoader"
+      - "moveit_pro::behaviors::ConverterBehaviorsLoader"
+      - "moveit_pro::behaviors::NavBehaviorsLoader"
+  objective_library_paths:
+    # An inherited library cannot be removed, so the MuJoCo one points at this package's Objectives.
+    mujoco_objectives:
+      package_name: "mobile_fr3_duo_hw"
+      relative_path: "objectives"
+    # A new key goes last: these Objectives win on file name, and the UI saves here.
+    mobile_fr3_duo_hw_objectives:
+      package_name: "mobile_fr3_duo_hw"
+      relative_path: "objectives"
+  # The mock's waypoints, with Ready and Stow also for each arm without the spine.
+  waypoints_file:
+    package_name: "mobile_fr3_duo_hw"
+    relative_path: "waypoints/waypoints.yaml"
+
+ros2_control:
+  config:
+    package: "mobile_fr3_duo_hw"
+    path: "config/control/mobile_fr3_duo_hw.ros2_control.yaml"
+  # Broadcasters only: activating a command controller switches a device's control mode,
+  # which stalls the control loop. Why not at startup: docs/AGENT_COMMENTS.md.
+  controllers_active_at_startup:
+    - "joint_state_broadcaster"
+    - "left_franka_robot_state_broadcaster"
+    - "right_franka_robot_state_broadcaster"
+  controllers_inactive_at_startup:
+    - "joint_trajectory_controller"
+    - "left_jtc"
+    - "right_jtc"
+    - "left_jtac"
+    - "right_jtac"
+    - "left_vfc"
+    - "right_vfc"
+    - "left_jvc"
+    - "right_jvc"
+    - "base_swerve_controller"
+  controllers_not_managed: []
+  controller_shared_topics: []

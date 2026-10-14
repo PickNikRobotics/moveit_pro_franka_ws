@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Open Gripper">
+  <!-- Replaces mobile_fr3_duo_mock's file: on the real robot a franka_gripper node drives each Franka Hand. -->
+  <BehaviorTree
+    ID="Open Gripper"
+    _description="Open the right gripper by default"
+    _favorite="true"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <!-- The position is per finger. franka_gripper moves to twice this width. -->
+      <Action
+        ID="MoveGripperAction"
+        gripper_command_action_name="/right/franka_gripper/gripper_action"
+        position="0.035"
+        timeout="10.000000"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Open Gripper">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="Grasping" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

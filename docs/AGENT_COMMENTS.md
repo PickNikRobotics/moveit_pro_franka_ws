@@ -15,7 +15,7 @@ Upstream v3.6.0 has neither. Only `franka_hardware_interface.cpp` and its test d
 ## colcon-defaults.yaml
 
 ### L16 `packages-ignore`
-fr3_solo_hw needs five franka_ros2 packages: franka_msgs, franka_hardware, franka_gripper, franka_robot_state_broadcaster, franka_semantic_components.
+fr3_solo_hw needs five franka_ros2 packages: franka_msgs, franka_hardware, franka_gripper, franka_robot_state_broadcaster, franka_semantic_components. mobile_fr3_duo_hw also needs franka_mobile (the base controller), franka_spine_msgs, franka_spine_server and franka_desk_api, which both of those use.
 The ignore list is every other package in the franka_ros2 submodule. Ignored, not skipped: colcon then treats them as absent, so a dependency on `realtime_tools` resolves to the system package without a warning. Several need Gazebo, robot-specific hardware or packages with no Jazzy release.
 `realtime_tools` in franka_ros2 is a vendored copy of the ROS package. Building it would shadow the system realtime_tools for the whole workspace; the system version has what franka_hardware uses.
 When the franka_ros2 submodule moves to a new release, check for new packages and add the unused ones here.
@@ -140,3 +140,106 @@ See the "Recover Arm" entry above. The franka_ros2 action server node is created
 
 ### L43-L45 lifecycle transitions
 The controller manager works out the chain of transitions, so an unconfigured component can go to active in one call. A request for the state the component is already in reports failure.
+
+## src/mobile_fr3_duo_hw/config/config.yaml
+
+### L8 based on mobile_fr3_duo_sim, not mobile_fr3_duo_mock
+The reasons of fr3_solo_hw's entry apply: the sim changes the `ros2_control_xacro` argument, the driver launch file and the controllers, which this config replaces, and adds `mujoco_model` and `mujoco_viewer`, which no hw xacro file declares, so xacro ignores them.
+The hw Nav2 launch also layers the sim's AMCL and laser parameters.
+
+### L30 `joint_group_name`
+The mock's default `manipulator` includes the spine, which no controller moves on the real robot. The SRDF has no group of both arms without the spine; adding one would change the mock's SRDF.
+
+### L51-L58 the two Objective library keys
+As in fr3_solo_hw's config.yaml (see that entry).
+
+### L59 `waypoints_file`
+RetrieveWaypoint returns a waypoint only for a group listed in its `joint_group_names` (retrieve_waypoint.cpp in 10.1.0). The mock lists only `manipulator` for Ready and Stow, so this copy adds the two spine-free arm groups to both.
+
+### L67-L68 broadcasters only at startup
+As in fr3_solo_hw. The base controller is inactive too: activating it switches the base to Cartesian velocity mode, with the same stall. "Stow Arms for Navigation" activates it while the arms are still.
+
+## src/mobile_fr3_duo_hw/config/control/mobile_fr3_duo_hw.ros2_control.yaml
+
+### L3-L17 the controller manager settings
+The settings and reasons of fr3_solo_hw's controllers file. With three devices, `shutdown_on_initial_state_failure: false` also keeps two working devices up when the third one is unreachable.
+
+### L51 `extra_joints`
+TmrHardware without the passive base exports only the four drive joints, but the URDF also has the rocker and caster joints. Without a value for them the robot state stays incomplete. They are published at zero, their position on level ground.
+
+### L71-L73 the controller of both arms
+Teleoperation and the per-arm Objectives send a trajectory for one arm. With `allow_partial_joints_goal`, the controller holds the joints the goal does not name at their current position.
+
+### L96, L128, L153 the effort gains
+From franka_ros2 `franka_fr3_moveit_config/config/fr3_ros_controllers.yaml` (v3.6.0), the same for both arms. Franka's mobile FR3 Duo MoveIt configuration has no effort trajectory controller.
+
+### L163, L178, L201 the per-arm controllers
+They use the mock's spine-free groups. The admittance controllers send position commands only (10.1.0), as in fr3_solo_hw. The jog controllers command velocity, with lower joint accelerations than the mock.
+
+### L217 `base_swerve_controller`
+- The name follows the workspace's `base_` prefix. The controller reads TwistStamped on `~/cmd_vel` and publishes `~/odom`. Its `cmd_vel_topic` parameter is declared but not used in v3.6.0 (`swerve_drive_controller.cpp`).
+- `enable_odom_tf: false`: robot_state_publisher already publishes `odom` -> `base_link` from the planar joints. A second publisher would give `base_link` two parents.
+- `odom_open_loop: false`: odometry from the base's own Cartesian pose state, not from integrated commands. The parameter file's default and the code's own default disagree, so it is set.
+- The limits are franka_ros2 `franka_bringup/config/controllers.yaml` (v3.6.0), whose comments say its angular acceleration was tested against the base's reflex. Franka's mobile FR3 Duo MoveIt configuration has higher limits.
+
+## src/mobile_fr3_duo_hw/description/mobile_fr3_duo_hw.ros2_control.xacro
+
+### L3-L6 the address defaults
+`robot_ips` in franka_ros2 `franka_bringup/config/mobile_fr3_duo.config.yaml` (v3.6.0), in the order base, left arm, right arm. The values in `config/config.yaml` win.
+
+### L14 asynchronous components
+franka_ros2's `mobile_fr3_duo.launch.py` makes all three components asynchronous. Each `read()` waits for its device's next state, so three synchronous devices would wait in turn inside one loop.
+franka_ros2 patches ros2_control to read `manage_overruns` from the async tag. Unpatched ros2_control (hardware_interface 4.45 in the MoveIt Pro main image) reads the tag's other attributes and ignores that one, so the async threads use its default overrun handling. Not tested on a robot.
+
+## src/mobile_fr3_duo_hw/launch/robot_drivers_to_persist.launch.py
+
+### L65 `gripper()`
+As in fr3_solo_hw, with a namespace per side so the two nodes and their actions are distinct.
+
+### L120 the scan frame
+franka_mobile_sensors' nanoScan3 macro (v3.6.0) puts the scan frame on the mounting point with a quarter turn about z. The macro itself is not used: franka_mobile_sensors is not built (one of its dependencies has no Jazzy release), and new URDF links with geometry would need SRDF collision entries.
+
+### L125 the merged scan
+AMCL and slam_toolbox take one scan topic, so mobile_fr3_duo_sim's scan merger combines the two scanners.
+
+### L140 `cameras()`
+The camera link sits on the mounting point, as in franka_mobile_sensors' `sensor_suite.xacro`. That macro also adds the D455's mount offset, which this static transform leaves out. Not checked on a robot.
+
+### L171 the spine
+`franka_spine_server` is franka_ros2's bridge to the spine's REST API. Its node name, `franka_spine_node`, sets the topic, service and action names that this package's spine joint publisher uses.
+
+## src/mobile_fr3_duo_hw/launch/navigation.launch.py
+
+### L19 `PARAM_LAYERS`
+The sim's AMCL and laser layer applies unchanged on top of the mock's file; mappings merge and lists replace, as in the mock's launch file.
+This package has its own launch file because the mock's starts `base_twist_to_planar` and a fixed `map` -> `odom`, which do not apply to the real base.
+
+### L49-L91 a saved map or slam_toolbox
+A site map is site data and stays out of the repository. Without one, slam_toolbox maps with the sim's `slam_toolbox.yaml` (mapping mode).
+
+## src/mobile_fr3_duo_hw/params/nav2_params.yaml
+
+### L22-L25 the command chain
+In nav2_bringup's `navigation_launch.py` (1.3.12, checked in the MoveIt Pro main image), the controller server, the behavior server and the velocity smoother publish into the chain, and the collision monitor publishes Nav2's final velocity command. Pointing its output topic at the base controller avoids a relay node.
+Nav2 Jazzy publishes Twist unless every node in the chain sets `enable_stamped_cmd_vel`; the behavior server's spin, back-up and other behavior plugins read it too. The docking server publishes outside the chain, so docking does not drive this base.
+
+## src/mobile_fr3_duo_hw/script/base_odometry_bridge.py
+
+### L89 `twist_in_odom_axes`
+In closed-loop mode the swerve controller differentiates the base's Cartesian pose, so its twist is along the odometry axes (`swerve_drive_controller.cpp`, v3.6.0). Nav2 reads the twist in `base_link`. Set false if a later version reports body-frame velocities.
+
+### L112-L117 the odom origin
+The base's pose state is its own odometry since power-on, so the first sample can be far from zero. Taking it as the origin keeps the planar joints from jumping when the controller activates; AMCL would read a jump as a teleport.
+
+## src/mobile_fr3_duo_hw/script/spine_joint_state_publisher.py
+
+### L88-L90 nothing before the first valid sample
+The spine height moves the base of both arms in the planning scene, so a default height could hide a real collision. The cost: without spine data, MoveIt plans nothing.
+
+## src/mobile_fr3_duo_hw/config/drivers.yaml
+
+### L9 `spine_ip`
+franka_ros2 `franka_spine/index.rst` launches the spine server with the base's address.
+
+### L16 `host_ip`
+The scanners send their data to this address, so it must be the host's address on the robot network.
