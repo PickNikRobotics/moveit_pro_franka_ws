@@ -141,6 +141,11 @@ See the "Recover Arm" entry above. The franka_ros2 action server node is created
 ### L43-L45 lifecycle transitions
 The controller manager works out the chain of transitions, so an unconfigured component can go to active in one call. A request for the state the component is already in reports failure.
 
+## src/franka_behaviors/src/move_spine_absolute.cpp
+
+### L133 the checks in `createGoal()`
+franka_spine_msgs' MoveAbsolute action requires velocity, acceleration and deceleration greater than zero, so the Behavior rejects other values before it sends a goal. It does not check the height: the travel lives in the spine and in the robot description, and "Move Spine Absolute" checks it with `CreateSpineState`.
+
 ## src/mobile_fr3_duo_hw/config/config.yaml
 
 ### L8 based on mobile_fr3_duo_sim, not mobile_fr3_duo_mock
@@ -243,3 +248,14 @@ franka_ros2 `franka_spine/index.rst` launches the spine server with the base's a
 
 ### L16 `host_ip`
 The scanners send their data to this address, so it must be the host's address on the robot network.
+
+
+## src/mobile_fr3_duo_hw/objectives/move_spine_absolute.xml
+
+### L10 `CreateSpineState` before the move
+It fails on a height outside the spine travel, as in the mock's version, so the real spine never receives such a goal. Its joint state output is not used here.
+
+## src/mobile_fr3_duo_hw/objectives/enable_spine.xml
+
+### L3 no switch-on at startup
+Switching the spine on lets it move. On a real robot that stays an operator's step, so no node does it at startup; a refused switch-on is usually a latched fault, which the Objective clears once.

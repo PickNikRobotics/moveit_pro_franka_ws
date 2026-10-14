@@ -10,6 +10,7 @@ The drivers come from the `franka_ros2` and `libfranka` submodules in `src/exter
 
 - Connect the host to the robot network.
 - In Franka Desk, unlock the joints and activate FCI on each arm.
+- Both arms must be reachable when the stack starts: each arm's robot state broadcaster starts active, and if its arm is unreachable, its start times out and MoveIt Pro stops the whole stack. An unreachable base only leaves the base joints and controller unavailable.
 - Set the addresses:
   - arms and base: `left_robot_ip`, `right_robot_ip` and `base_robot_ip` under `hardware.robot_description.urdf_params` in `config/config.yaml`. The Franka Hand drivers read the arm addresses from there too.
   - spine, lidars and cameras: `config/drivers.yaml`.
@@ -78,7 +79,11 @@ The base controller is inactive at startup. Every navigation Objective first run
 
 ## Spine
 
-The real spine has no ros2_control interface, so no controller moves it. `franka_spine_server` offers its `move_absolute` action and `switch_on` and `fault_reset` services, but no MoveIt Pro Behavior calls them yet. In this configuration the spine is read-only: the planning scene shows its height, and the spine Objectives inherited from `mobile_fr3_duo_mock` fail, because `spine_jtc` does not exist here.
+The real spine has no ros2_control interface, so no controller moves it. `franka_spine_server` bridges its REST API: the `move_absolute` action, the `switch_on` and `fault_reset` services, and the `position` topic that the spine joint publisher reads.
+
+- "Enable Spine" switches the spine on (`SwitchOnSpine`); if the spine refuses, it clears the fault (`ResetSpineFault`) and tries once more. Nothing switches the spine on at startup.
+- "Move Spine Absolute" and "Move Spine to Pose Height" replace the mock's versions with the same ports. They check the height against the spine travel, then call `MoveSpineAbsolute`. The arms do not move.
+- The spine Behaviors come from `franka_behaviors`. Planning groups that include the spine still cannot execute here: no trajectory controller drives the spine.
 
 ## Controllers
 
@@ -109,6 +114,8 @@ Jogging works on the arms only: the base and the spine have no jog controller he
 | Move Base to Ready, Navigate to Clicked Point | Stow the arms, then drive with Nav2. |
 | Teleoperate | MoveIt Pro's Teleoperate, executing on `joint_trajectory_controller`. |
 | Recover Left Arm, Recover Right Arm, Recover Base | Clear a reflex or error on one device, then restore its hardware component and the broadcasters. After Recover Base, run Activate Mobile Base. |
+| Enable Spine | Switches the spine on, clearing a fault first if needed. |
+| Move Spine Absolute, Move Spine to Pose Height | Moves the spine to a height, or to the height of a target pose. Run Enable Spine first. |
 
 ## Known limitations
 
@@ -116,7 +123,7 @@ Jogging works on the arms only: the base and the spine have no jog controller he
 - When a device reports a reflex or an error at activation (at startup, or in a Recover Objective), franka_hardware first tries one automatic error recovery. The device stays inactive only if that fails.
 - MoveIt Pro's core motion Objectives default to `joint_trajectory_admittance_controller` and the `manipulator` group, which includes the spine. Neither works here: use this package's Objectives, or pass a spine-free group and `joint_trajectory_controller`.
 - In teleoperation, dragging the base iMarker stows the arms and then fails: `mobile_fr3_duo_mock`'s "Request Teleoperation" switches to `base_jgvc`, which does not exist on the real robot. Drive the base with "Navigate to Clicked Point".
-- The spine is read-only (see Spine). The IMU that the sim models has no driver here.
+- The spine moves only through its own Objectives (see Spine), not as part of a planned trajectory. The IMU that the sim models has no driver here.
 - The configuration is built and checked without a robot. Nothing has run on a real Mobile FR3 Duo yet.
 
 ## Layout

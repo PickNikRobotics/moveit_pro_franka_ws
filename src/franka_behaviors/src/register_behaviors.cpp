@@ -35,7 +35,9 @@
 #include <franka_behaviors/error_recovery_action.hpp>
 #include <franka_behaviors/franka_grasp_action.hpp>
 #include <franka_behaviors/get_spine_state_for_pose_height.hpp>
+#include <franka_behaviors/move_spine_absolute.hpp>
 #include <franka_behaviors/set_hardware_component_state.hpp>
+#include <franka_behaviors/spine_state_service.hpp>
 
 namespace franka_behaviors
 {
@@ -48,6 +50,9 @@ public:
     moveit_pro::behaviors::registerBehavior<CreateSpineState>(factory, "CreateSpineState", shared_resources);
     moveit_pro::behaviors::registerBehavior<GetSpineStateForPoseHeight>(factory, "GetSpineStateForPoseHeight",
                                                                         shared_resources);
+    moveit_pro::behaviors::registerBehavior<MoveSpineAbsolute>(factory, "MoveSpineAbsolute", shared_resources);
+    moveit_pro::behaviors::registerBehavior<SwitchOnSpine>(factory, "SwitchOnSpine", shared_resources);
+    moveit_pro::behaviors::registerBehavior<ResetSpineFault>(factory, "ResetSpineFault", shared_resources);
     moveit_pro::behaviors::registerBehavior<ErrorRecoveryAction>(factory, "FrankaErrorRecovery", shared_resources);
     moveit_pro::behaviors::registerBehavior<FrankaGraspAction>(factory, "FrankaGraspAction", shared_resources);
     moveit_pro::behaviors::registerBehavior<SetHardwareComponentState>(factory, "SetHardwareComponentState",

@@ -3,9 +3,9 @@
   <name>franka_behaviors</name>
   <version>10.1.0</version>
   <description>
-    MoveIt Pro Behaviors for Franka robots: the vertical spine, and arm error
-    recovery,
-    hardware component state and Franka Hand grasps on real hardware.
+    MoveIt Pro Behaviors for Franka robots: the vertical spine, the real spine's
+    moves and state, and arm error recovery, hardware component state and Franka
+    Hand grasps on real hardware.
   </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>
@@ -16,6 +16,7 @@
 
   <depend>controller_manager_msgs</depend>
   <depend>franka_msgs</depend>
+  <depend>franka_spine_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>lifecycle_msgs</depend>
   <depend>moveit_msgs</depend>
