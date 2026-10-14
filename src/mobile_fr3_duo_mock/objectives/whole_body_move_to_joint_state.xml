@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root BTCPP_format="4" main_tree_to_execute="Whole Body Move to Joint State">
-  <!-- joint_trajectory_controller runs the plan, base_pid drives the planar joints; JTAC and base_jgvc come back after, also on failure. -->
+  <!-- body_jtc runs the plan, base_pid drives the planar joints; JTAC and base_jgvc come back after, also on failure. -->
   <BehaviorTree
     ID="Whole Body Move to Joint State"
     _description="Plan and execute one motion of the base, the spine and the arms to a joint state, then hand the robot back to the arm controller and Nav2's base controller"
@@ -13,8 +13,8 @@
           _collapsed="true"
           target_joint_state="{target_joint_state}"
           joint_group_name="{joint_group_name}"
-          controller_names="base_pid;joint_trajectory_controller"
-          controller_action_server="/joint_trajectory_controller/follow_joint_trajectory"
+          controller_names="base_pid;body_jtc"
+          controller_action_server="/body_jtc/follow_joint_trajectory"
           execution_pipeline="jtc"
         />
         <Decorator ID="ForceFailure">

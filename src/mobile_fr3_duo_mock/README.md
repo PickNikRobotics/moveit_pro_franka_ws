@@ -34,7 +34,7 @@ The base also has a teleop iMarker: `base_link` is the end effector of `mobile_b
 
 The planning group `whole_body` holds the planar joints, the spine and both arms. `left_manipulator_with_base` and `right_manipulator_with_base` hold the planar joints, the spine and one arm; their pose IK costs make the base move only when the arm cannot reach (`config/moveit/pose_ik.yaml`).
 
-`joint_trajectory_controller` executes these groups. Its planar joints are chained through `base_pid`, a `pid_controller/PidController` that turns their position references into the planar velocity commands `base_jgvc` sends for Nav2. The two pairs claim the same planar joints, so one runs at a time: the whole-body Objectives switch `base_pid` and `joint_trajectory_controller` in, then `joint_trajectory_admittance_controller` and `base_jgvc` back, also when the motion fails. Arm-only motion keeps the admittance controller; whole-body motion has no force compliance and no time scaling.
+`body_jtc` executes these groups. Its planar joints are chained through `base_pid`, a `pid_controller/PidController` that turns their position references into the planar velocity commands `base_jgvc` sends for Nav2. The two pairs claim the same planar joints, so one runs at a time: the whole-body Objectives switch `base_pid` and `body_jtc` in, then `joint_trajectory_admittance_controller` and `base_jgvc` back, also when the motion fails. Arm-only motion keeps the admittance controller; whole-body motion has no force compliance and no time scaling.
 
 | Objective | What it does |
 | --- | --- |
@@ -85,7 +85,7 @@ moveit_pro run -c mobile_fr3_duo_mock
 
 ## Controllers
 
-The whole upper body (`manipulator`: spine and both arms) keeps the standard controller name. Controllers for a part of the robot use short names: `jtac` (JointTrajectoryAdmittanceController), `jtc` (JointTrajectoryController), `vfc` (VelocityForceController), `jvc` (JointVelocityController), `jgvc` (JointGroupVelocityController). `left_`/`right_` is one arm; the `_w_spine` suffix adds the spine.
+The whole upper body (`manipulator`: spine and both arms) keeps the standard controller name. Controllers for a part of the robot use short names: `jtac` (JointTrajectoryAdmittanceController), `jtc` (JointTrajectoryController), `vfc` (VelocityForceController), `jvc` (JointVelocityController), `jgvc` (JointGroupVelocityController). `left_`/`right_` is one arm; the `_w_spine` suffix adds the spine. `body_jtc` drives the base, the spine and both arms together.
 
 | Controller | Type | Group | At startup |
 | --- | --- | --- | --- |
@@ -101,5 +101,5 @@ The whole upper body (`manipulator`: spine and both arms) keeps the standard con
 | `spine_jvc` | `joint_velocity_controller/JointVelocityController` | `spine` | inactive |
 | `base_jvc` | `joint_velocity_controller/JointVelocityController` | `mobile_base` | inactive |
 | `base_vfc` | `velocity_force_controller/VelocityForceController` | `mobile_base` | inactive |
-| `joint_trajectory_controller` | `joint_trajectory_controller/JointTrajectoryController` | `whole_body`, `left_manipulator_with_base`, `right_manipulator_with_base` | inactive |
-| `base_pid` | `pid_controller/PidController` | planar joints, chained under `joint_trajectory_controller` | inactive |
+| `body_jtc` | `joint_trajectory_controller/JointTrajectoryController` | `whole_body`, `left_manipulator_with_base`, `right_manipulator_with_base` | inactive |
+| `base_pid` | `pid_controller/PidController` | planar joints, chained under `body_jtc` | inactive |

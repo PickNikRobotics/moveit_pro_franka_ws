@@ -20,7 +20,7 @@ controller_manager:
       type: velocity_force_controller/VelocityForceController
     base_jgvc:
       type: velocity_controllers/JointGroupVelocityController
-    joint_trajectory_controller:
+    body_jtc:
       type: joint_trajectory_controller/JointTrajectoryController
     base_pid:
       type: pid_controller/PidController
@@ -148,7 +148,7 @@ base_jgvc:
 
 # Whole-body trajectories (whole_body and the *_manipulator_with_base groups). The planar joints go
 # through base_pid; the whole-body Objectives switch both in, then JTAC and base_jgvc back.
-joint_trajectory_controller:
+body_jtc:
   ros__parameters:
     joints:
       - planar_x
@@ -201,7 +201,7 @@ joint_trajectory_controller:
       planar_y: {goal: 0.005}
       planar_theta: {goal: 0.005}
 
-# Chained under joint_trajectory_controller: turns its planar position references into the
+# Chained under body_jtc: turns its planar position references into the
 # planar velocity commands that base_jgvc otherwise sends for Nav2.
 base_pid:
   ros__parameters:

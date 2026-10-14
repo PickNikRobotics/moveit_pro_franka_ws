@@ -63,7 +63,7 @@ ros2_control:
     - "base_vfc"
     # The whole-body pair: switched in by the whole-body Objectives.
     - "base_pid"
-    - "joint_trajectory_controller"
+    - "body_jtc"
 
 objectives:
   behavior_loader_plugins:

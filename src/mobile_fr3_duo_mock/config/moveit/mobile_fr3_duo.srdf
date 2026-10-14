@@ -24,7 +24,7 @@
         <joint name="planar_y"/>
         <joint name="planar_theta"/>
     </group>
-    <!-- Base, spine and arms as one mechanism, run by joint_trajectory_controller. -->
+    <!-- Base, spine and arms as one mechanism, run by body_jtc. -->
     <group name="whole_body">
         <group name="mobile_base"/>
         <group name="manipulator"/>
