@@ -1,3 +1,5 @@
+# Some values come from franka_ros2 3.6.0 (Copyright 2023 Franka Robotics GmbH, Apache License,
+# Version 2.0; LICENSES/franka_ros2-LICENSE); comments name each source. Modified by PickNik Inc., 2026.
 # Controllers for the real FR3 (franka_hardware). The Franka Hand has no controller here:
 # the franka_gripper node drives it. Why each setting: docs/AGENT_COMMENTS.md.
 controller_manager:

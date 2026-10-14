@@ -24,6 +24,21 @@ Third-party files:
     v2, spine, head and TMR base), with the Menagerie parts listed below; each
     file says so in a comment at its top.
 
+- franka_ros2 3.6.0
+  Copyright 2023 Franka Robotics GmbH
+  Licensed under the Apache License, Version 2.0. Its LICENSE file is copied
+  unchanged to LICENSES/franka_ros2-LICENSE. Values copied from it, each named
+  in a comment where it is used:
+  - The effort gains in src/fr3_solo_hw/config/control/ come from
+    franka_fr3_moveit_config/config/fr3_ros_controllers.yaml.
+  - The joint accelerations in src/fr3_solo_hw/config/moveit/joint_limits.yaml
+    come from franka_fr3_moveit_config/config/fr3_joint_limits.yaml.
+  - The default robot address of fr3_solo_hw comes from franka_bringup
+    (launch/franka.launch.py).
+  - src/fr3_solo_hw/launch/robot_drivers_to_persist.launch.py starts the
+    franka_gripper node with the parameters that franka_ros2's own launch files
+    give it.
+
 - MuJoCo Menagerie Franka FR3 model (franka_fr3)
   Licensed under the Apache License, Version 2.0. Its LICENSE file, which also
   contains a BSD license section, is copied unchanged to the LICENSE file in
@@ -49,3 +64,14 @@ Third-party files:
   - The finger coupling (tendon and equality constraints) in
     src/fr3_duo_spine_sim/mjcf/fr3_duo.xml and
     src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml comes from the model's hand.xml.
+
+Git submodules, fetched from upstream and not modified. Each carries its own
+LICENSE and NOTICE files:
+
+- src/external_dependencies/franka_description: franka_description 2.9.0,
+  Copyright 2023 Franka Robotics GmbH, Apache License, Version 2.0.
+- src/external_dependencies/franka_ros2: franka_ros2 3.6.0, Copyright 2023
+  Franka Robotics GmbH, Apache License, Version 2.0.
+- src/external_dependencies/libfranka: libfranka 0.20.5, Copyright 2023 Franka
+  Robotics GmbH, Apache License, Version 2.0, with its common submodule
+  (Copyright 2024 Franka Robotics GmbH, Apache License, Version 2.0).

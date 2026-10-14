@@ -1,3 +1,6 @@
+# Starts franka_gripper as franka_ros2 3.6.0's gripper.launch.py does (Copyright 2023 Franka Robotics GmbH,
+# Apache License, Version 2.0; LICENSES/franka_ros2-LICENSE). Modified by PickNik Inc., 2026.
+
 from launch import LaunchDescription
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node

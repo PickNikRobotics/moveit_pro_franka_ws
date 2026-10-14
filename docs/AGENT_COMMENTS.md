@@ -52,38 +52,38 @@ During bring-up that can trip the communication reflex. With only state broadcas
 
 ## src/fr3_solo_hw/config/control/fr3_solo_hw.ros2_control.yaml
 
-### L6 `thread_priority`
+### L8 `thread_priority`
 The real-time priority of the controller manager's thread. The hardware component is synchronous (see the description file), so this thread also reads and writes the robot. The drivers container allows this priority (docker-compose.yaml).
 
-### L7-L10 `overruns`
+### L9-L12 `overruns`
 ros2_control's default skips the cycles a long loop missed and re-phases. `manage: false` lets the loop catch up instead, as franka_ros2's own controller files set it. Warnings stay on: they are the only report of overruns.
 
-### L11-L12 `lock_memory`
+### L13-L14 `lock_memory`
 `ros2_control_node` locks the process memory only when this is true or the kernel is real-time. A failure to lock is only a warning, so check the drivers log for "Unable to lock the memory".
 
-### L13-L15 `shutdown_on_initial_state_failure`
+### L15-L17 `shutdown_on_initial_state_failure`
 franka_hardware refuses to activate while the robot reports a reflex or an error. The default turns that refusal into the end of the controller manager. False keeps the node up with the arm inactive, so "Recover Arm" can clear the fault.
 
-### L33 `update_rate` of the joint state broadcaster
+### L35 `update_rate` of the joint state broadcaster
 At the full loop rate the broadcaster floods `/joint_states`. The finger joints are not in this list: the franka_gripper node publishes them to `/joint_states`.
 
-### L46 `allow_nonzero_velocity_at_trajectory_end`
+### L48 `allow_nonzero_velocity_at_trajectory_end`
 Trajectories sampled from a plan can end on a tiny residual velocity. Without this, the trajectory controller rejects such a goal and logs the reason only in its own log.
 
-### L61 the effort gains
+### L63 the effort gains
 Copied from franka_ros2 `franka_fr3_moveit_config/config/fr3_ros_controllers.yaml` (release v3.6.0). In effort mode the gains are used, so a gain under a wrong joint name changes how the arm moves.
 
-### L71 the admittance controller
+### L73 the admittance controller
 It sends position commands, the only command interface it supports in MoveIt Pro 10.1.0. franka_hardware does not rate-limit joint position commands by default, and the FR3 rejects a position command stream that is not smooth enough. Not tested on a real arm.
 franka_hardware also exports an estimated wrench sensor (`fr3_tcp`), which is not wired into this controller.
 
-### L80, L99 the jog controllers
+### L82, L101 the jog controllers
 Velocity commands: jog commands in the FR3's position mode can trip its continuity reflex. Only the joint velocity controller reads the JointJog messages, so joint jog must name it.
 The joint accelerations are lower than in the mock for the real arm.
 
 ## src/fr3_solo_hw/config/moveit/joint_limits.yaml
 
-### L1-L2 the accelerations
+### L3-L4 the accelerations
 From franka_ros2 `franka_fr3_moveit_config/config/fr3_joint_limits.yaml` (release v3.6.0), Franka's own MoveIt limits for the real FR3. The mock's accelerations are higher.
 
 ## src/fr3_solo_hw/description/fr3_solo_hw.ros2_control.xacro
@@ -100,10 +100,10 @@ An async component would need franka_ros2's `manage_overruns` patch to ros2_cont
 
 ## src/fr3_solo_hw/launch/robot_drivers_to_persist.launch.py
 
-### L8 `robot_ip_from_config`
+### L11 `robot_ip_from_config`
 The arm reads `robot_ip` from `config/config.yaml` through `urdf_params`. The Franka Hand driver reads the same entry through MoveIt Pro's config parser, so one edit changes both. This file runs in the drivers process, where `MOVEIT_CONFIG_PACKAGE` and `USER_WS` are set.
 
-### L20-L21 the franka_gripper node
+### L23-L24 the franka_gripper node
 Started directly rather than through franka_gripper's `gripper.launch.py`, which has no remap option. The node publishes finger joint states on `~/joint_states`; the remap puts them on `/joint_states`, so the planning scene shows the real finger opening.
 If the node cannot reach the hand, it exits and the finger joints are missing from the robot state.
 

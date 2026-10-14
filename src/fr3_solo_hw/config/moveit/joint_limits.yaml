@@ -1,3 +1,5 @@
+# Some values come from franka_ros2 3.6.0 (Copyright 2023 Franka Robotics GmbH, Apache License,
+# Version 2.0; LICENSES/franka_ros2-LICENSE); comments name each source. Modified by PickNik Inc., 2026.
 # fr3_solo_mock's position and velocity limits, with the accelerations of franka_ros2's MoveIt
 # configuration for the real FR3. Source and reason: docs/AGENT_COMMENTS.md.
 joint_limits:
