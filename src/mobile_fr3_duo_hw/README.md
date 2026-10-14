@@ -123,6 +123,7 @@ Jogging works on the arms only: the base and the spine have no jog controller he
 - When a device reports a reflex or an error at activation (at startup, or in a Recover Objective), franka_hardware first tries one automatic error recovery. The device stays inactive only if that fails.
 - MoveIt Pro's core motion Objectives default to `joint_trajectory_admittance_controller` and the `manipulator` group, which includes the spine. Neither works here: use this package's Objectives, or pass a spine-free group and `joint_trajectory_controller`.
 - In teleoperation, dragging the base iMarker stows the arms and then fails: `mobile_fr3_duo_mock`'s "Request Teleoperation" switches to `base_jgvc`, which does not exist on the real robot. Drive the base with "Navigate to Clicked Point".
+- The whole-body Objectives inherited from `mobile_fr3_duo_mock` ("Whole Body Move to Waypoint", "Whole Body Move to Pose", "Whole Body Reach Left" and "Whole Body Move to Joint State") do not run here: they switch to `body_jtc` and `base_pid`, which this package does not have.
 - The spine moves only through its own Objectives (see Spine), not as part of a planned trajectory. The IMU that the sim models has no driver here.
 - The configuration is built and checked without a robot. Nothing has run on a real Mobile FR3 Duo yet.
 
