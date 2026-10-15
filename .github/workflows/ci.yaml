@@ -24,7 +24,10 @@ jobs:
       # The default picknikciuser/moveit-studio image has no 10.1.0 tag, so name the moveit-pro image.
       image_ref: picknikciuser/moveit-pro:${{ github.event.inputs.image_tag || '10.1.0' }}-{0}
       ros_distros: '["jazzy"]'
-      colcon_test_args: "--executor sequential"
+      # CI's shallow, tagless submodule checkout cannot configure libfranka, so CI neither builds
+      # nor tests libfranka or the packages that depend on it. Local and robot builds still do.
+      colcon_build_args: "--packages-skip libfranka --packages-skip-by-dep libfranka"
+      colcon_test_args: "--executor sequential --packages-skip-by-dep libfranka"
       runner: ubuntu-24.04
     secrets:
       moveit_license_key: ${{ secrets.STUDIO_CI_LICENSE_KEY }}
