@@ -5,6 +5,7 @@ MoveIt Pro configuration for the real Franka Mobile FR3 Duo: two FR3 v2 arms wit
 It inherits from `mobile_fr3_duo_sim` (which inherits from `mobile_fr3_duo_mock`): robot description, SRDF, kinematics, joint limits and the Nav2 parameters stay the same.
 It replaces the ros2_control hardware with franka_hardware: one `FrankaHardwareInterface` per arm and one for the base. It adds the drivers that are outside ros2_control, and has its own controllers, jog settings, Objectives and waypoints.
 The drivers come from the `franka_ros2` and `libfranka` submodules in `src/external_dependencies`.
+CI does not build or test this package, because it depends on libfranka (see `.github/workflows/ci.yaml`): run its tests locally.
 
 ## Before you run
 
