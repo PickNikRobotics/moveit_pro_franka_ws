@@ -62,6 +62,7 @@ RUN groupadd realtime && \
 # Install additional dependencies
 # You can also add any necessary apt-get install, pip install, etc. commands at this point.
 # NOTE: The /opt/overlay_ws folder contains MoveIt Pro binary packages and the source file.
+# The skipped rosdep keys have no Jazzy package. Only franka_ros2 packages that are not built need them.
 # hadolint ignore=SC1091
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -70,7 +71,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     rosdep install -q -y \
       --from-paths src \
-      --ignore-src
+      --ignore-src \
+      --skip-keys "olv_module_descriptions robotiq_driver zed_wrapper"
 
 # Set up colcon defaults for the new user
 USER ${USERNAME}
@@ -81,6 +83,9 @@ RUN colcon mixin add default \
     https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml && \
     colcon metadata update
 COPY colcon-defaults.yaml /home/${USERNAME}/.colcon/defaults.yaml
+
+# ccache in depend mode: GCC 13 can crash on libfranka sources in ccache's default preprocessor mode.
+ENV CCACHE_DEPEND=1
 
 # hadolint ignore=DL3002
 USER root

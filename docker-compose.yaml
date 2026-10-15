@@ -14,6 +14,11 @@ services:
 
   # Starts the robot drivers.
   drivers:
+    # Real-time limits for the FR3 control loop: thread priority, and memory locking so it is never paged out.
+    # rtprio repeats the MoveIt Pro compose value, so the merge keeps both limits.
+    ulimits:
+      rtprio: 99
+      memlock: -1
     volumes:
       # Allow access to host hardware e.g. RealSense cameras
       - /dev:/dev

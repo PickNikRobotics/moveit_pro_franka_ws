@@ -1,0 +1,7 @@
+# Package-specific colcon arguments, read from the workspace root where colcon runs.
+# libfranka: its tests and examples are not needed here, and they lengthen every build.
+names:
+  libfranka:
+    cmake-args:
+      - "-DBUILD_TESTS=OFF"
+      - "-DBUILD_EXAMPLES=OFF"
