@@ -17,15 +17,16 @@ This is a MoveIt Pro **10.1.0+ / ROS 2 Jazzy** workspace.
 | [`fr3_duo_spine_sim`](src/fr3_duo_spine_sim) | FR3 Duo on a fixed pedestal and spine | MuJoCo, robot only |
 | [`mobile_fr3_duo_mock`](src/mobile_fr3_duo_mock) | Mobile FR3 Duo: TMR v0.2 swerve base, spine, two FR3 v2 arms, two Franka Hands | mock hardware, with Nav2 on a room map |
 | [`mobile_fr3_duo_sim`](src/mobile_fr3_duo_sim) | Mobile FR3 Duo | MuJoCo, with a room scene, lidars and Nav2 |
+| [`mobile_fr3_duo_hw`](src/mobile_fr3_duo_hw) | Mobile FR3 Duo | real hardware: franka_hardware for the arms and base, franka_gripper, the spine server, lidars, cameras and Nav2 |
 | [`franka_behaviors`](src/franka_behaviors) | Franka Behaviors: the spine Behaviors (`CreateSpineState`, `GetSpineStateForPoseHeight`) and the real-hardware Behaviors (`FrankaErrorRecovery`, `SetHardwareComponentState`, `FrankaGraspAction`) | built with the workspace |
 | [`external_dependencies/franka_description`](https://github.com/frankarobotics/franka_description) | Franka robot descriptions | submodule, release 2.9.0 |
-| [`external_dependencies/franka_ros2`](https://github.com/PickNikRoboticsServices/franka_ros2/tree/fix/v3.6.0-activation-error-recovery) | Franka ROS 2 drivers; the workspace builds franka_msgs, franka_hardware, franka_gripper, franka_robot_state_broadcaster and franka_semantic_components | submodule, PickNik's fork: upstream v3.6.0 plus two franka_hardware fixes (branch `fix/v3.6.0-activation-error-recovery`) |
+| [`external_dependencies/franka_ros2`](https://github.com/PickNikRoboticsServices/franka_ros2/tree/fix/v3.6.0-activation-error-recovery) | Franka ROS 2 drivers; the workspace builds franka_msgs, franka_hardware, franka_gripper, franka_robot_state_broadcaster, franka_semantic_components, franka_mobile, franka_spine_msgs, franka_spine_server and franka_desk_api | submodule, PickNik's fork: upstream v3.6.0 plus two franka_hardware fixes (branch `fix/v3.6.0-activation-error-recovery`) |
 | [`external_dependencies/libfranka`](https://github.com/frankarobotics/libfranka) | Franka control library, used by franka_ros2 | submodule, release 0.20.5 |
 
 Each `_sim` package inherits from its `_mock` package (`based_on_package`) and sets the mock's `ros2_control_xacro` argument to its own MuJoCo hardware.
 `fr3_solo_sim`, `fr3_duo_sim` and `fr3_duo_spine_sim` change only the hardware; `mobile_fr3_duo_sim` also replaces the controllers and adds AMCL and laser obstacle layers to the mock's Nav2 (see its README).
-`fr3_solo_hw` inherits from `fr3_solo_sim` and sets the same argument to franka_hardware; see its README before you connect a robot.
-The other robots have no real-hardware (`_hw`) configuration yet; [issue #10](https://github.com/PickNikRobotics/moveit_pro_franka_ws/issues/10) tracks them.
+`fr3_solo_hw` and `mobile_fr3_duo_hw` inherit from their `_sim` package and set the same argument to franka_hardware; see their READMEs before you connect a robot.
+The FR3 Duo and the FR3 Duo on a spine have no real-hardware (`_hw`) configuration yet; [issue #10](https://github.com/PickNikRobotics/moveit_pro_franka_ws/issues/10) tracks them.
 
 ## Getting started
 
@@ -42,7 +43,7 @@ moveit_pro run -c fr3_solo_sim
 
 Use `-c` with any configuration package from the table, for example `-c mobile_fr3_duo_sim`.
 If you cloned without `--recurse-submodules`, run `git submodule update --init --recursive` first.
-The first build also compiles libfranka and the franka_ros2 driver packages for `fr3_solo_hw`.
+The first build also compiles libfranka and the franka_ros2 driver packages for the `_hw` configurations.
 If you cloned without git-lfs, run `git lfs install` and `git lfs pull` first.
 
 ## Controller names

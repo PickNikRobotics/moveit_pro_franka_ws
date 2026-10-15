@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="MTC Cartesian Move to Poses">
+  <BehaviorTree
+    ID="MTC Cartesian Move to Poses"
+    _description="Plan a Cartesian path of the tip link through a list of poses and execute it on the joint trajectory controller. When require_approval is true, wait for the user to approve the trajectory first."
+  >
+    <Control ID="Sequence" name="root">
+      <Action
+        ID="SwitchController"
+        activate_controllers="{controller_names}"
+        automatic_activation="true"
+        automatic_deactivation="true"
+        strictness="1"
+        activate_asap="true"
+        timeout="-1.0"
+      />
+      <Action ID="InitializeMTCTask" task="{mtc_task}" timeout="-1.000000" />
+      <Action ID="SetupMTCCurrentState" task="{mtc_task}" />
+      <Action
+        ID="SetupMTCPathIK"
+        task="{mtc_task}"
+        path="{target_poses}"
+        planning_group_name="{planning_group_name}"
+        tip_links="{tip_link}"
+        velocity_scale_factor="{velocity_scale_factor}"
+        acceleration_scale_factor="{acceleration_scale_factor}"
+        position_only="false"
+        ignore_environment_collisions="false"
+        blending_radius="0.00001"
+        ik_cartesian_space_density="0.010000"
+        ik_joint_space_density="0.100000"
+        max_optimizer_iterations="1"
+        trajectory_sampling_rate="100"
+      />
+      <Action
+        ID="PlanMTCTask"
+        solution="{mtc_solution}"
+        task="{mtc_task}"
+        max_solutions="0"
+        suppress_failure_message="false"
+      />
+      <Decorator ID="Precondition" if="require_approval == true" else="SUCCESS">
+        <Action
+          ID="WaitForUserTrajectoryApproval"
+          solution="{mtc_solution}"
+          cartesian_path_links="{tip_link}"
+        />
+      </Decorator>
+      <Action
+        ID="ConvertMtcSolutionToJointTrajectory"
+        solution="{mtc_solution}"
+        joint_group="{planning_group_name}"
+        velocity_scaling_factor="{velocity_scale_factor}"
+        acceleration_scaling_factor="{acceleration_scale_factor}"
+        sampling_rate="100"
+        joint_trajectory="{joint_trajectory_msg}"
+      />
+      <Action
+        ID="ExecuteTrajectory"
+        controller_action_name="{controller_action_name}"
+        execution_pipeline="jtc"
+        joint_trajectory_msg="{joint_trajectory_msg}"
+        goal_duration_tolerance="-1.0"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="MTC Cartesian Move to Poses">
+      <MetadataFields>
+        <Metadata subcategory="Motion - Execute" />
+        <Metadata runnable="false" />
+      </MetadataFields>
+      <inout_port
+        name="target_poses"
+        default="{target_poses}"
+        type="std::vector&lt;geometry_msgs::msg::PoseStamped&gt;"
+      />
+      <inout_port
+        name="planning_group_name"
+        default="left_manipulator_without_spine"
+        type="std::string"
+      />
+      <inout_port
+        name="tip_link"
+        default="left_grasp_link"
+        type="std::string"
+      />
+      <inout_port name="velocity_scale_factor" default="1.0" type="double" />
+      <inout_port
+        name="acceleration_scale_factor"
+        default="1.0"
+        type="double"
+      />
+      <inout_port name="require_approval" default="false" type="bool" />
+      <inout_port
+        name="controller_names"
+        default="joint_trajectory_controller"
+        type="std::string"
+      />
+      <inout_port
+        name="controller_action_name"
+        default="/joint_trajectory_controller/follow_joint_trajectory"
+        type="std::string"
+      />
+    </SubTree>
+  </TreeNodesModel>
+</root>

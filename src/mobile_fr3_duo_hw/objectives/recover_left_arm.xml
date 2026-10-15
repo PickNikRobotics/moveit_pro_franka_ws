@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Recover Left Arm">
+  <BehaviorTree
+    ID="Recover Left Arm"
+    _description="Clear a reflex or error on the left arm, then restore its hardware component and the broadcasters."
+    _favorite="true"
+  >
+    <SubTree
+      ID="Recover Franka Hardware"
+      _collapsed="true"
+      error_recovery_action="/left/action_server/error_recovery"
+      hardware_name="left_FrankaHardwareInterface"
+      broadcasters="joint_state_broadcaster;left_franka_robot_state_broadcaster"
+      recovery_timeout="15.0"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Recover Left Arm">
+      <MetadataFields>
+        <Metadata subcategory="Franka" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

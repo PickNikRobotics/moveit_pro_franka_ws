@@ -1,0 +1,25 @@
+# Layered last by launch/navigation.launch.py, after mobile_fr3_duo_mock's params/nav2_params.yaml
+# and mobile_fr3_duo_sim's: mappings merge, lists replace.
+# The real base controller reads stamped velocity commands, so every node that publishes one opts in.
+
+controller_server:
+  ros__parameters:
+    enable_stamped_cmd_vel: true
+
+behavior_server:
+  ros__parameters:
+    enable_stamped_cmd_vel: true
+
+velocity_smoother:
+  ros__parameters:
+    enable_stamped_cmd_vel: true
+
+docking_server:
+  ros__parameters:
+    enable_stamped_cmd_vel: true
+
+# The last node of the command chain: its output goes straight to the base controller.
+collision_monitor:
+  ros__parameters:
+    enable_stamped_cmd_vel: true
+    cmd_vel_out_topic: "/base_swerve_controller/cmd_vel"

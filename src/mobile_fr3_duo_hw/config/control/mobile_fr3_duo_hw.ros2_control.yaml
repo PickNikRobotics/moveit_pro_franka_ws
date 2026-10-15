@@ -1,0 +1,253 @@
+# Some values come from franka_ros2 3.6.0 (Copyright 2023 Franka Robotics GmbH, Apache License,
+# Version 2.0; LICENSES/franka_ros2-LICENSE); comments name each source. Modified by PickNik Inc., 2026.
+# Controllers for the real Mobile FR3 Duo. This file stands on its own: it inherits nothing from
+# the mock or the sim. Why each setting: docs/AGENT_COMMENTS.md.
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz
+    thread_priority: 99
+    # Catch up after a long cycle instead of skipping it, as franka_ros2 sets it.
+    overruns:
+      manage: false
+      print_warnings: true
+    # Keep the controller manager's memory in RAM, so paging cannot delay the control loop.
+    lock_memory: true
+    # A device that refuses to activate (reflex, error, unreachable) must not stop the others.
+    hardware_components_initial_state:
+      shutdown_on_initial_state_failure: false
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    left_franka_robot_state_broadcaster:
+      type: franka_robot_state_broadcaster/FrankaRobotStateBroadcaster
+    right_franka_robot_state_broadcaster:
+      type: franka_robot_state_broadcaster/FrankaRobotStateBroadcaster
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    left_jtc:
+      type: joint_trajectory_controller/JointTrajectoryController
+    right_jtc:
+      type: joint_trajectory_controller/JointTrajectoryController
+    left_jtac:
+      type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
+    right_jtac:
+      type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
+    left_vfc:
+      type: velocity_force_controller/VelocityForceController
+    right_vfc:
+      type: velocity_force_controller/VelocityForceController
+    left_jvc:
+      type: joint_velocity_controller/JointVelocityController
+    right_jvc:
+      type: joint_velocity_controller/JointVelocityController
+    base_swerve_controller:
+      type: franka_mobile/SwerveDriveController
+
+joint_state_broadcaster:
+  ros__parameters:
+    update_rate: 100
+    # Passive base joints: no device reports them, so they are published at their zero position.
+    # The spine, planar and finger joints have their own publishers; do not list them here.
+    extra_joints:
+      - rocker_arm_joint
+      - caster_front_left_steering_joint
+      - caster_front_left_joint
+      - caster_rear_right_steering_joint
+      - caster_rear_right_joint
+
+left_franka_robot_state_broadcaster:
+  ros__parameters:
+    arm_prefix: left
+    robot_type: fr3v2
+    convenience_publish_rate: 100
+
+right_franka_robot_state_broadcaster:
+  ros__parameters:
+    arm_prefix: right
+    robot_type: fr3v2
+    convenience_publish_rate: 100
+
+# Both arms, for trajectories of either arm: a goal for one arm holds the other where it is.
+joint_trajectory_controller:
+  ros__parameters:
+    allow_partial_joints_goal: true
+    allow_nonzero_velocity_at_trajectory_end: true
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - left_fr3v2_joint1
+      - left_fr3v2_joint2
+      - left_fr3v2_joint3
+      - left_fr3v2_joint4
+      - left_fr3v2_joint5
+      - left_fr3v2_joint6
+      - left_fr3v2_joint7
+      - right_fr3v2_joint1
+      - right_fr3v2_joint2
+      - right_fr3v2_joint3
+      - right_fr3v2_joint4
+      - right_fr3v2_joint5
+      - right_fr3v2_joint6
+      - right_fr3v2_joint7
+    # Effort gains from franka_ros2 franka_fr3_moveit_config, the same for both arms.
+    gains:
+      left_fr3v2_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+      left_fr3v2_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+      left_fr3v2_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }
+      right_fr3v2_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+      right_fr3v2_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+      right_fr3v2_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }
+
+left_jtc:
+  ros__parameters:
+    allow_nonzero_velocity_at_trajectory_end: true
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - left_fr3v2_joint1
+      - left_fr3v2_joint2
+      - left_fr3v2_joint3
+      - left_fr3v2_joint4
+      - left_fr3v2_joint5
+      - left_fr3v2_joint6
+      - left_fr3v2_joint7
+    gains:
+      left_fr3v2_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      left_fr3v2_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+      left_fr3v2_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+      left_fr3v2_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }
+
+right_jtc:
+  ros__parameters:
+    allow_nonzero_velocity_at_trajectory_end: true
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - right_fr3v2_joint1
+      - right_fr3v2_joint2
+      - right_fr3v2_joint3
+      - right_fr3v2_joint4
+      - right_fr3v2_joint5
+      - right_fr3v2_joint6
+      - right_fr3v2_joint7
+    gains:
+      right_fr3v2_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      right_fr3v2_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+      right_fr3v2_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+      right_fr3v2_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }
+
+# Position commands only, as in fr3_solo_hw. Not tested on a real arm.
+left_jtac:
+  ros__parameters:
+    planning_group_name: left_manipulator_without_spine
+    ee_frames: [left_grasp_link]
+    sensor_frames: [left_fr3v2_link8]
+    stop_accelerations: [30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+
+right_jtac:
+  ros__parameters:
+    planning_group_name: right_manipulator_without_spine
+    ee_frames: [right_grasp_link]
+    sensor_frames: [right_fr3v2_link8]
+    stop_accelerations: [30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+
+# Pose jog. Velocity commands, with lower joint accelerations than the mock.
+left_vfc:
+  ros__parameters:
+    planning_group_name: left_manipulator_without_spine
+    ee_frame: left_grasp_link
+    sensor_frame: left_fr3v2_link8
+    command_interfaces: ["velocity"]
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_joint_acceleration: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_cartesian_velocity: [0.25, 0.25, 0.25, 1.0, 1.0, 1.0]
+    max_cartesian_acceleration: [2.0, 2.0, 2.0, 4.0, 4.0, 4.0]
+
+right_vfc:
+  ros__parameters:
+    planning_group_name: right_manipulator_without_spine
+    ee_frame: right_grasp_link
+    sensor_frame: right_fr3v2_link8
+    command_interfaces: ["velocity"]
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_joint_acceleration: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_cartesian_velocity: [0.25, 0.25, 0.25, 1.0, 1.0, 1.0]
+    max_cartesian_acceleration: [2.0, 2.0, 2.0, 4.0, 4.0, 4.0]
+
+# Joint jog. Only this controller type reads the joint jog commands.
+left_jvc:
+  ros__parameters:
+    planning_group_name: left_manipulator_without_spine
+    command_interfaces: ["velocity"]
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_joint_acceleration: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+right_jvc:
+  ros__parameters:
+    planning_group_name: right_manipulator_without_spine
+    command_interfaces: ["velocity"]
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_joint_acceleration: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+# The TMR base. It reads velocity commands on ~/cmd_vel and publishes its odometry on ~/odom.
+# The planar joints carry odom -> base_link, so this controller must not publish that transform.
+base_swerve_controller:
+  ros__parameters:
+    wheel_1_link_name: argo_drive_front_link
+    wheel_2_link_name: argo_drive_rear_link
+    base_link_frame_id: base_link
+    odom_frame_id: odom
+    enable_odom_tf: false
+    enable_odom_nav: true
+    # Odometry from the base's own pose, not from the commands sent to it.
+    odom_open_loop: false
+    # Limits from franka_ros2 franka_bringup/config/controllers.yaml, the same as the mock's Nav2 limits.
+    linear:
+      x:
+        has_velocity_limits: true
+        max_velocity: 0.35
+        min_velocity: -0.35
+        has_acceleration_limits: true
+        max_acceleration: 0.4
+        min_acceleration: -0.4
+        has_jerk_limits: false
+      y:
+        has_velocity_limits: true
+        max_velocity: 0.35
+        min_velocity: -0.35
+        has_acceleration_limits: true
+        max_acceleration: 0.4
+        min_acceleration: -0.4
+        has_jerk_limits: false
+    angular:
+      z:
+        has_velocity_limits: true
+        max_velocity: 0.5
+        min_velocity: -0.5
+        has_acceleration_limits: true
+        max_acceleration: 0.3
+        min_acceleration: -0.3
+        has_jerk_limits: false
