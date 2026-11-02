@@ -13,22 +13,18 @@ build:
     - build-testing-on
     - coverage-gcc
     - coverage-pytest
-  # franka_ros2 packages that fr3_solo_hw does not use, treated as absent. Its vendored realtime_tools would shadow the system one.
+  # franka_ros2 packages that no _hw configuration uses, treated as absent. Its vendored realtime_tools would shadow the system one.
   packages-ignore:
     - franka_bringup
-    - franka_desk_api
     - franka_example_controllers
     - franka_fr3_moveit_config
     - franka_gazebo_bringup
     - franka_gazebo_hardware
-    - franka_mobile
     - franka_mobile_fr3_duo_moveit_config
     - franka_mobile_sensors
     - franka_ros2
     - franka_selfcollision
     - franka_spine_examples
-    - franka_spine_msgs
-    - franka_spine_server
     - franka_vision_and_manipulation_kit
     - mobile_fr3_duo_trajectory_controller
     - realtime_tools

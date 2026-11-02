@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Teleoperate">
+  <!-- Replaces MoveIt Pro's core file of the same name: it runs this robot's Request Teleoperation on the controller of both arms. -->
+  <BehaviorTree
+    ID="Teleoperate"
+    _description="Handles the different variations of teleoperation from the web UI. Can be used standalone."
+    _favorite="false"
+    _hardcoded="false"
+  >
+    <SubTree
+      ID="Request Teleoperation"
+      enable_user_interaction="false"
+      user_interaction_prompt=""
+      initial_teleop_mode="3"
+      require_user_approval="{require_user_approval}"
+      joint_trajectory_controller_name="joint_trajectory_controller"
+      controller_action_server="/joint_trajectory_controller/follow_joint_trajectory"
+      execution_pipeline="jtc"
+    />
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Teleoperate">
+      <MetadataFields>
+        <Metadata subcategory="User Input" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+      <input_port name="require_user_approval" default="true" type="bool">
+        Whether trajectory previews from Interactive Marker teleop must be
+        approved before execution. Set to false to skip the approval prompt.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

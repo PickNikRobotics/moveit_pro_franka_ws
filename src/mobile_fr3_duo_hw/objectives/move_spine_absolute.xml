@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Move Spine Absolute">
+  <!-- Replaces mobile_fr3_duo_mock's file: the real spine moves through the spine server's MoveAbsolute action. -->
+  <BehaviorTree
+    ID="Move Spine Absolute"
+    _description="Move the spine to an absolute height, then stop. The arms do not move. Run Enable Spine first."
+    _favorite="true"
+  >
+    <Control ID="Sequence">
+      <!-- Checks the height against the spine travel before the spine moves. -->
+      <Action
+        ID="CreateSpineState"
+        position="{position}"
+        spine_joint_state="{spine_joint_state}"
+      />
+      <Action
+        ID="MoveSpineAbsolute"
+        action_name="{action_name}"
+        position="{position}"
+        velocity="{velocity}"
+        acceleration="{acceleration}"
+        deceleration="{deceleration}"
+        timeout="{timeout}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Move Spine Absolute">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="Motion - Execute" />
+      </MetadataFields>
+      <input_port name="position" default="0.3" type="double">
+        Absolute spine height in meters, within the spine travel. A height
+        outside the travel fails.
+      </input_port>
+      <input_port name="velocity" default="0.05" type="double">
+        Motion velocity in meters per second, greater than zero.
+      </input_port>
+      <input_port name="acceleration" default="0.1" type="double">
+        Motion acceleration in meters per second squared, greater than zero.
+      </input_port>
+      <input_port name="deceleration" default="0.1" type="double">
+        Motion deceleration in meters per second squared, greater than zero.
+      </input_port>
+      <input_port name="timeout" default="60.0" type="double">
+        Seconds to wait for the move to finish before the Objective fails.
+      </input_port>
+      <input_port
+        name="action_name"
+        default="/franka_spine_node/move_absolute"
+        type="std::string"
+      >
+        The real spine's MoveAbsolute action.
+      </input_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>
