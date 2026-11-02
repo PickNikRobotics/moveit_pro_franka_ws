@@ -4,15 +4,29 @@ project(franka_behaviors CXX)
 find_package(moveit_pro_package REQUIRED)
 moveit_pro_package()
 
-set(THIS_PACKAGE_INCLUDE_DEPENDS moveit_pro_behavior_interface pluginlib geometry_msgs moveit_msgs
-                                 tf2_geometry_msgs tf2_ros)
+set(THIS_PACKAGE_INCLUDE_DEPENDS
+    moveit_pro_behavior_interface
+    pluginlib
+    controller_manager_msgs
+    franka_msgs
+    geometry_msgs
+    lifecycle_msgs
+    moveit_msgs
+    tf2_geometry_msgs
+    tf2_ros)
 foreach(package IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${package} REQUIRED)
 endforeach()
 
-# The spine Behaviors.
-add_library(franka_behaviors SHARED src/create_spine_state.cpp src/get_spine_state_for_pose_height.cpp
-                                    src/register_behaviors.cpp)
+# The spine Behaviors, then the real-hardware Behaviors.
+add_library(
+  franka_behaviors SHARED
+  src/create_spine_state.cpp
+  src/get_spine_state_for_pose_height.cpp
+  src/error_recovery_action.cpp
+  src/franka_grasp_action.cpp
+  src/set_hardware_component_state.cpp
+  src/register_behaviors.cpp)
 target_include_directories(franka_behaviors PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                                    $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(franka_behaviors ${THIS_PACKAGE_INCLUDE_DEPENDS})

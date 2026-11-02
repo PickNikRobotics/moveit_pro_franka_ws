@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<launch>
+  <!-- The whole stack in one launch, for a host without the MoveIt Pro containers. -->
+  <include
+    file="$(find-pkg-share moveit_studio_agent)/launch/robot_drivers.launch.py"
+  />
+  <include
+    file="$(find-pkg-share moveit_studio_agent)/launch/studio_agent_bridge.launch.xml"
+  />
+  <include
+    file="$(find-pkg-share moveit_studio_rest_api)/launch/rest_api.launch.xml"
+  />
+</launch>

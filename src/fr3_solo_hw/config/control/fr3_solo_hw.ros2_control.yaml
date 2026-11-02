@@ -1,0 +1,109 @@
+# Some values come from franka_ros2 3.6.0 (Copyright 2023 Franka Robotics GmbH, Apache License,
+# Version 2.0; LICENSES/franka_ros2-LICENSE); comments name each source. Modified by PickNik Inc., 2026.
+# Controllers for the real FR3 (franka_hardware). The Franka Hand has no controller here:
+# the franka_gripper node drives it. Why each setting: docs/AGENT_COMMENTS.md.
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz, the FR3 control loop
+    thread_priority: 99
+    # Catch up after an overrun instead of skipping cycles, as franka_ros2 does.
+    overruns:
+      manage: false
+      print_warnings: true
+    # Keep the control process in RAM. A page fault on the control loop can trip a reflex.
+    lock_memory: true
+    # A faulted arm stays inactive and does not stop the node, so error recovery stays reachable.
+    hardware_components_initial_state:
+      shutdown_on_initial_state_failure: false
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    franka_robot_state_broadcaster:
+      type: franka_robot_state_broadcaster/FrankaRobotStateBroadcaster
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    joint_trajectory_admittance_controller:
+      type: joint_trajectory_admittance_controller/JointTrajectoryAdmittanceController
+    velocity_force_controller:
+      type: velocity_force_controller/VelocityForceController
+    joint_velocity_controller:
+      type: joint_velocity_controller/JointVelocityController
+
+joint_state_broadcaster:
+  ros__parameters:
+    # Slower than the control loop. The finger joints come from the franka_gripper node.
+    update_rate: 100
+
+franka_robot_state_broadcaster:
+  ros__parameters:
+    # Must equal the prefix and robot type of the hardware block in description/.
+    arm_prefix: ""
+    robot_type: fr3
+    convenience_publish_rate: 100
+
+# The default controller for executing trajectories: torque commands from a PD on the trajectory.
+joint_trajectory_controller:
+  ros__parameters:
+    # Accept the near-zero end velocity of sampled trajectories.
+    allow_nonzero_velocity_at_trajectory_end: true
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - fr3_joint1
+      - fr3_joint2
+      - fr3_joint3
+      - fr3_joint4
+      - fr3_joint5
+      - fr3_joint6
+      - fr3_joint7
+    # Gains from franka_ros2's MoveIt configuration. In effort mode they set how the arm moves.
+    gains:
+      fr3_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      fr3_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      fr3_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      fr3_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+      fr3_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+      fr3_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+      fr3_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }
+
+# Position commands. No force/torque sensor is set, so it follows trajectories without admittance.
+joint_trajectory_admittance_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    ee_frames: [grasp_link]
+    sensor_frames: [fr3_link8]
+    # Joint accelerations for immediate stops, for example when a trajectory is cancelled.
+    stop_accelerations: [30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0]
+
+# Pose jog target. Velocity commands: position commands trip the FR3 continuity reflex.
+velocity_force_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    ee_frame: grasp_link
+    sensor_frame: fr3_link8
+    ft_force_deadband: 2.0
+    ft_torque_deadband: 1.0
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_joint_acceleration: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_cartesian_velocity: [0.25, 0.25, 0.25, 1.0, 1.0, 1.0]
+    max_cartesian_acceleration: [2.0, 2.0, 2.0, 4.0, 4.0, 4.0]
+    ft_cutoff_frequency_ratio: 1.0
+    state_publish_rate: 10
+    jacobian_damping: 0.002
+    command_timeout: 0.2
+    joint_limit_position_tolerance: 0.02
+    command_interfaces: ["velocity"]
+
+# Joint jog target. Only this controller reads the JointJog commands.
+joint_velocity_controller:
+  ros__parameters:
+    planning_group_name: manipulator
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    max_joint_acceleration: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    command_timeout: 0.2
+    joint_limit_position_tolerance: 0.02
+    state_publish_rate: 20
+    command_interfaces: ["velocity"]

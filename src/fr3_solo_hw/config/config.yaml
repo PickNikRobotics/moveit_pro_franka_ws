@@ -1,0 +1,72 @@
+###############################################################
+#
+#  This configures the robot to work with MoveIt Pro
+#
+###############################################################
+
+# Everything not set here comes from fr3_solo_sim and fr3_solo_mock: description,
+# SRDF, kinematics, jogging and 3D sensors. Why sim and not mock: docs/AGENT_COMMENTS.md.
+based_on_package: "fr3_solo_sim"
+
+runtime_launch_file:
+  package: "fr3_solo_hw"
+  path: "launch/runtime.launch.xml"
+
+hardware:
+  # The Franka Hand driver. It stays up for the whole run of the drivers container.
+  additional_driver_launch_file:
+    package: "fr3_solo_hw"
+    path: "launch/robot_drivers_to_persist.launch.py"
+  robot_description:
+    # Overrides only these xacro arguments; the other inherited ones stay.
+    urdf_params:
+      # The real FR3 through franka_hardware, in place of the MuJoCo hardware.
+      - ros2_control_xacro:
+          package: "fr3_solo_hw"
+          path: "description/fr3_solo_hw.ros2_control.xacro"
+      # Address of the FR3 control box. The Franka Hand driver reads it from here too.
+      - robot_ip: "172.16.0.3"
+
+moveit_params:
+  # Lower accelerations for the real arm.
+  joint_limits:
+    package: "fr3_solo_hw"
+    path: "config/moveit/joint_limits.yaml"
+
+objectives:
+  # Replaces the inherited list: the MuJoCo Behaviors have no use on the real robot.
+  behavior_loader_plugins:
+    core:
+      - "moveit_pro::behaviors::CoreBehaviorsLoader"
+      - "moveit_pro::behaviors::MTCCoreBehaviorsLoader"
+      - "moveit_pro::behaviors::VisionBehaviorsLoader"
+      - "moveit_pro::behaviors::ConverterBehaviorsLoader"
+  objective_library_paths:
+    # An inherited library cannot be removed, so the MuJoCo one points at this package's Objectives.
+    mujoco_objectives:
+      package_name: "fr3_solo_hw"
+      relative_path: "objectives"
+    # A new key goes last: these Objectives win on file name, and the UI saves here.
+    fr3_solo_hw_objectives:
+      package_name: "fr3_solo_hw"
+      relative_path: "objectives"
+  waypoints_file:
+    package_name: "fr3_solo_hw"
+    relative_path: "waypoints/waypoints.yaml"
+
+ros2_control:
+  config:
+    package: "fr3_solo_hw"
+    path: "config/control/fr3_solo_hw.ros2_control.yaml"
+  # Broadcasters only: activating a command controller switches the arm's control mode,
+  # which blocks the control loop. Why not at startup: docs/AGENT_COMMENTS.md.
+  controllers_active_at_startup:
+    - "joint_state_broadcaster"
+    - "franka_robot_state_broadcaster"
+  controllers_inactive_at_startup:
+    - "joint_trajectory_controller"
+    - "joint_trajectory_admittance_controller"
+    - "velocity_force_controller"
+    - "joint_velocity_controller"
+  controllers_not_managed: []
+  controller_shared_topics: []

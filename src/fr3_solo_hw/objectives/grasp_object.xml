@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Grasp Object">
+  <BehaviorTree
+    ID="Grasp Object"
+    _description="Grasp an object with the Franka Hand at a set width and force. Fails if the fingers do not stop within the tolerance of the width."
+  >
+    <Control ID="Sequence" name="root">
+      <Action
+        ID="FrankaGraspAction"
+        action_name="/franka_gripper/grasp"
+        width="{width}"
+        speed="{speed}"
+        force="{force}"
+        inner_epsilon="{inner_epsilon}"
+        outer_epsilon="{outer_epsilon}"
+        timeout="10.000000"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Grasp Object">
+      <MetadataFields>
+        <Metadata subcategory="Grasping" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+      <inout_port name="width" default="0.02" type="double">
+        Width of the object between the fingers, in meters.
+      </inout_port>
+      <inout_port name="force" default="50.0" type="double">
+        Grasp force, in newtons.
+      </inout_port>
+      <inout_port name="speed" default="0.03" type="double">
+        Closing speed of the fingers, in meters per second.
+      </inout_port>
+      <inout_port name="inner_epsilon" default="0.005" type="double">
+        How much smaller than the width the grasp can be, in meters.
+      </inout_port>
+      <inout_port name="outer_epsilon" default="0.005" type="double">
+        How much larger than the width the grasp can be, in meters.
+      </inout_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>

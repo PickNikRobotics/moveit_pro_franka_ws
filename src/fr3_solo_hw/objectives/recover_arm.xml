@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Recover Arm">
+  <BehaviorTree
+    ID="Recover Arm"
+    _description="Clear a reflex or error on the FR3, then restore its hardware component and broadcasters. Motion controllers stay inactive until an Objective activates them."
+  >
+    <Control ID="Sequence" name="root">
+      <Action
+        ID="FrankaErrorRecovery"
+        action_name="{error_recovery_action}"
+        timeout="{recovery_timeout}"
+      />
+      <!-- The fault normally takes the component out of active already, so this step can fail. -->
+      <Decorator ID="ForceSuccess">
+        <Action
+          ID="SetHardwareComponentState"
+          hardware_name="{hardware_name}"
+          target_state="inactive"
+          timeout="10.0"
+        />
+      </Decorator>
+      <Action
+        ID="SetHardwareComponentState"
+        hardware_name="{hardware_name}"
+        target_state="active"
+        timeout="10.0"
+      />
+      <Action
+        ID="SwitchController"
+        activate_controllers="joint_state_broadcaster;franka_robot_state_broadcaster"
+        strictness="2"
+        activate_asap="true"
+        timeout="10.0"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Arm recovery complete."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Recover Arm">
+      <MetadataFields>
+        <Metadata subcategory="Franka" />
+        <Metadata runnable="true" />
+      </MetadataFields>
+      <inout_port
+        name="error_recovery_action"
+        default="/action_server/error_recovery"
+        type="std::string"
+      >
+        The franka_ros2 error_recovery action of the arm.
+      </inout_port>
+      <inout_port
+        name="hardware_name"
+        default="FrankaHardwareInterface"
+        type="std::string"
+      >
+        The arm's ros2_control hardware component, named in
+        description/fr3_solo_hw.ros2_control.xacro.
+      </inout_port>
+      <inout_port name="recovery_timeout" default="15.0" type="double">
+        Seconds to wait for the arm to clear its fault.
+      </inout_port>
+    </SubTree>
+  </TreeNodesModel>
+</root>
