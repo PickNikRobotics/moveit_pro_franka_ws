@@ -1,0 +1,61 @@
+# Some values come from franka_ros2 3.6.0 (Copyright 2023 Franka Robotics GmbH, Apache License,
+# Version 2.0; LICENSES/franka_ros2-LICENSE); comments name each source. Modified by PickNik Inc., 2026.
+# Drivers outside ros2_control, for launch/robot_drivers_to_persist.launch.py: the spine server
+# and the base sensors that mobile_fr3_duo_sim models. Set the addresses and ports of your robot here.
+# The arm and base addresses are in config/config.yaml.
+
+spine:
+  # The spine's REST endpoint. Default from franka_ros2 franka_spine/index.rst.
+  spine_ip: "172.16.16.10"
+
+# Sensor defaults from franka_ros2 franka_mobile_sensors/config: default_sensor_suite.yaml and the
+# device profiles it names.
+
+lidars:
+  # The host's address on the robot network: the scanners send their data to it.
+  host_ip: "172.16.16.50"
+  scanners:
+    - name: lidar_front
+      sensor_ip: "172.16.16.60"
+    - name: lidar_rear
+      sensor_ip: "172.16.16.61"
+  # sick_safetyscanners2 settings (franka_mobile_sensors config/lidars/sick_nanoscan3.yaml).
+  # With use_persistent_config, the scan window comes from each scanner's stored configuration.
+  parameters:
+    channel: 0
+    channel_enabled: true
+    skip: 0
+    angle_start: -0.7854
+    angle_end: 3.9270
+    time_offset: 0.0
+    general_system_state: true
+    derived_settings: true
+    measurement_data: true
+    intrusion_data: true
+    application_io_data: true
+    use_persistent_config: true
+    min_intensities: 0.0
+
+cameras:
+  # Each camera is found by its USB port. Give serial_no instead to find it by serial number.
+  devices:
+    - name: camera_front
+      usb_port_id: "2-1.1.1"
+    - name: camera_rear
+      usb_port_id: "2-1.1.3"
+    - name: camera_left
+      usb_port_id: "2-1.1.2"
+    - name: camera_right
+      usb_port_id: "2-1.1.4"
+  # realsense2_camera settings (franka_mobile_sensors config/cameras/franka_mobile_d455.yaml).
+  parameters:
+    device_type: "d455"
+    enable_color: true
+    enable_depth: false
+    enable_infra1: false
+    enable_infra2: false
+    enable_gyro: false
+    enable_accel: false
+    pointcloud.enable: false
+    align_depth.enable: false
+    rgb_camera.color_profile: "640x480x30"

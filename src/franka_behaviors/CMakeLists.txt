@@ -9,6 +9,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     pluginlib
     controller_manager_msgs
     franka_msgs
+    franka_spine_msgs
     geometry_msgs
     lifecycle_msgs
     moveit_msgs
@@ -18,11 +19,13 @@ foreach(package IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${package} REQUIRED)
 endforeach()
 
-# The spine Behaviors, then the real-hardware Behaviors.
+# The spine Behaviors, the real spine's Behaviors, then the real-hardware Behaviors.
 add_library(
   franka_behaviors SHARED
   src/create_spine_state.cpp
   src/get_spine_state_for_pose_height.cpp
+  src/move_spine_absolute.cpp
+  src/spine_state_service.cpp
   src/error_recovery_action.cpp
   src/franka_grasp_action.cpp
   src/set_hardware_component_state.cpp

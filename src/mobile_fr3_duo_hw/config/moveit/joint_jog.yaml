@@ -1,0 +1,5 @@
+# Planning groups to use in JointJog, and their corresponding JVC controllers.
+# The number of elements in `planning_groups` and `controllers` must match.
+# Arms only: the spine and the planar base joints have no jog controller on the real robot.
+planning_groups: ['left_manipulator_without_spine', 'right_manipulator_without_spine']
+controllers: ['left_jvc', 'right_jvc']

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Move To Waypoint with Approval">
+  <BehaviorTree
+    ID="Move To Waypoint with Approval"
+    _description="Plan to a saved waypoint and execute on the joint trajectory controller. When approval_flag is true and a user is connected, wait for the user to approve the trajectory first."
+  >
+    <Control ID="Sequence" name="root">
+      <Action
+        ID="RetrieveWaypoint"
+        waypoint_joint_state="{target_joint_state}"
+        waypoint_name="{waypoint_name}"
+        joint_group_name="{joint_group_name}"
+      />
+      <Action ID="SwitchController" activate_controllers="{controller_names}" />
+      <Action
+        ID="PlanToJointGoal"
+        joint_goal="{target_joint_state}"
+        planning_group_name="{joint_group_name}"
+        link_padding="{link_padding}"
+        orientation_constraint="{orientation_constraint}"
+        velocity_scale_factor="{velocity_scale_factor}"
+        acceleration_scale_factor="{acceleration_scale_factor}"
+        trajectory_timing="{trajectory_timing}"
+        seed="{seed}"
+        joint_trajectory_msg="{joint_trajectory_msg}"
+      />
+      <!-- Without a connected user there is nobody to approve, so execution goes ahead. -->
+      <Decorator ID="Precondition" if="approval_flag == true" else="SUCCESS">
+        <Control ID="Fallback">
+          <Decorator ID="Inverter">
+            <Action ID="IsUserAvailable" />
+          </Decorator>
+          <SubTree
+            ID="Wait for Joint Trajectory Approval"
+            joint_trajectory_msg="{joint_trajectory_msg}"
+            cartesian_path_links="{cartesian_path_links}"
+          />
+        </Control>
+      </Decorator>
+      <Action
+        ID="ExecuteTrajectory"
+        execution_pipeline="jtc"
+        controller_action_name="{controller_action_server}"
+        joint_trajectory_msg="{joint_trajectory_msg}"
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Move To Waypoint with Approval">
+      <MetadataFields>
+        <Metadata subcategory="Motion - Execute" />
+        <Metadata runnable="false" />
+      </MetadataFields>
+      <inout_port name="waypoint_name" default="" type="std::string" />
+      <inout_port name="approval_flag" default="false" type="bool">
+        When true, wait for the user to approve the trajectory before it
+        executes.
+      </inout_port>
+      <inout_port
+        name="joint_group_name"
+        default="left_manipulator_without_spine"
+        type="std::string"
+      />
+      <inout_port name="link_padding" default="0.01" type="double" />
+      <inout_port name="seed" default="0" type="int" />
+      <inout_port
+        name="orientation_constraint"
+        default="[]"
+        type="moveit_studio_msgs::msg::OrientationConstraint"
+      />
+      <inout_port name="velocity_scale_factor" default="1.0" type="double" />
+      <inout_port
+        name="acceleration_scale_factor"
+        default="1.0"
+        type="double"
+      />
+      <inout_port
+        name="trajectory_timing"
+        default="{trajectory_timing}"
+        type="moveit_studio_msgs::msg::TrajectoryTiming"
+      />
+      <inout_port
+        name="controller_names"
+        default="joint_trajectory_controller"
+        type="std::vector&lt;std::string&gt;"
+      />
+      <inout_port
+        name="controller_action_server"
+        default="/joint_trajectory_controller/follow_joint_trajectory"
+        type="std::string"
+      />
+      <inout_port
+        name="cartesian_path_links"
+        default="left_grasp_link"
+        type="std::vector&lt;std::string&gt;"
+      />
+    </SubTree>
+  </TreeNodesModel>
+</root>

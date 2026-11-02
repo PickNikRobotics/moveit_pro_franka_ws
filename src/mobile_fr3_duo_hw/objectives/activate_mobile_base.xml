@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Activate Mobile Base">
+  <!-- The base controller is inactive at startup; Nav2 can drive only after this. -->
+  <BehaviorTree
+    ID="Activate Mobile Base"
+    _description="Activate the base controller so Nav2 can drive the base. Keep the arms still while it runs: switching the base's control mode stalls the control loop once."
+    _favorite="false"
+  >
+    <Control ID="Sequence" name="TopLevelSequence">
+      <Action
+        ID="SwitchController"
+        activate_controllers="base_swerve_controller"
+        automatic_activation="true"
+        automatic_deactivation="true"
+        strictness="1"
+        activate_asap="true"
+        timeout="-1.0"
+      />
+      <Action
+        ID="LogMessage"
+        log_level="info"
+        message="Base controller active."
+      />
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Activate Mobile Base">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="Navigation" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>

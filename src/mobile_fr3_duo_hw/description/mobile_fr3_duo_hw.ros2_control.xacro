@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- mobile_fr3_duo_hw sets these through urdf_params. The defaults are franka_ros2's own mobile FR3 Duo bringup addresses. -->
+  <xacro:arg name="left_robot_ip" default="172.16.16.12" />
+  <xacro:arg name="right_robot_ip" default="172.16.16.11" />
+  <xacro:arg name="base_robot_ip" default="172.16.16.10" />
+
+  <xacro:include filename="$(find franka_hardware)/ros2_control/franka_arm.ros2_control.xacro" />
+  <xacro:include filename="$(find franka_hardware)/ros2_control/franka_arm_hardware_plugins.xacro" />
+  <xacro:include filename="$(find franka_hardware)/ros2_control/tmrv0_2.ros2_control.xacro" />
+  <!-- The base interface file does not include its plugin macros. -->
+  <xacro:include filename="$(find franka_hardware)/ros2_control/tmrv0_2_hardware_plugins.xacro" />
+
+  <!-- One component per device, each asynchronous on its own thread, as in franka_ros2's mobile FR3 Duo bringup. -->
+  <!-- The Franka Hands are not here: a franka_gripper node drives each one. -->
+  <xacro:macro name="mobile_fr3_duo_hw_arm" params="side robot_ip">
+    <xacro:franka_arm_ros2_control
+      robot_type="fr3v2"
+      include_effort_command="true"
+      include_finger_joint="false"
+      arm_prefix="${side}_"
+      is_async="true"
+    >
+      <hardware_plugin>
+        <xacro:franka_real_hardware_plugin robot_ip="${robot_ip}" arm_prefix="${side}_" />
+      </hardware_plugin>
+    </xacro:franka_arm_ros2_control>
+  </xacro:macro>
+
+  <xacro:mobile_fr3_duo_hw_arm side="left" robot_ip="$(arg left_robot_ip)" />
+  <xacro:mobile_fr3_duo_hw_arm side="right" robot_ip="$(arg right_robot_ip)" />
+
+  <!-- The TMR base takes a Cartesian velocity; its firmware turns it into wheel commands. -->
+  <!-- Only the drive joints: the passive joints come from joint_state_broadcaster, the spine from the spine node. -->
+  <xacro:tmrv0_2_ros2_control
+    mobile_robot_type="tmrv0_2"
+    include_passive_base="false"
+    is_async="true"
+  >
+    <hardware_plugin>
+      <xacro:tmrv0_2_real_hardware_plugin robot_ip="$(arg base_robot_ip)" />
+    </hardware_plugin>
+  </xacro:tmrv0_2_ros2_control>
+</robot>

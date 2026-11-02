@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root BTCPP_format="4" main_tree_to_execute="Enable Spine">
+  <!-- Nothing switches the spine on at startup: this Objective is the operator's step. -->
+  <BehaviorTree
+    ID="Enable Spine"
+    _description="Switch the real spine on so it accepts moves. If it refuses, clear its fault and try once more."
+    _favorite="true"
+  >
+    <Control ID="Fallback">
+      <Action ID="SwitchOnSpine" />
+      <Control ID="Sequence">
+        <Action ID="ResetSpineFault" />
+        <Action ID="SwitchOnSpine" />
+      </Control>
+    </Control>
+  </BehaviorTree>
+  <TreeNodesModel>
+    <SubTree ID="Enable Spine">
+      <MetadataFields>
+        <Metadata runnable="true" />
+        <Metadata subcategory="Franka" />
+      </MetadataFields>
+    </SubTree>
+  </TreeNodesModel>
+</root>
