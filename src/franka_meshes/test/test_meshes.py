@@ -1,6 +1,7 @@
 """Checks the meshes install where package:// references expect them, and hold real geometry."""
 
 import struct
+import sys
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,10 @@ import pytest
 PACKAGE = Path(__file__).resolve().parents[1]
 MESHES = PACKAGE / "meshes"
 SUBMODULE = PACKAGE.parent / "external_dependencies" / "franka_description" / "meshes"
+
+sys.path.insert(0, str(PACKAGE / "script"))
+
+import generate_collision_decomposition as generator  # noqa: E402
 
 # Each source mesh and the number of convex parts committed for it.
 SOURCES = {
@@ -118,6 +123,27 @@ def test_visual_mesh_parses(mesh):
                 highest = max(highest, index)
     assert vertices and faces, f"{mesh.name} holds no geometry: a Git LFS pointer file?"
     assert highest <= vertices, f"{mesh.name} indexes a vertex it does not define"
+
+
+def test_generator_targets_the_same_source_meshes():
+    assert generator.SOURCE_MESHES == SUBMODULE
+    assert generator.MAX_PARTS.keys() == SOURCES.keys()
+
+
+@pytest.mark.parametrize("source, count", SOURCES.items())
+def test_generator_writes_the_committed_parts(source, count):
+    """Binds the generator's output paths to the committed files, so a rerun overwrites them."""
+    assert count <= generator.MAX_PARTS[source], "more parts than the generator's cap"
+    expected = generator.part_paths(source, count)
+    stem = Path(source).stem
+    assert sorted(expected) == sorted(MESHES.rglob(f"{stem}_convex_*.stl"))
+
+
+@pytest.mark.parametrize("source", SOURCES)
+def test_generator_resolves_its_input(source):
+    if not (SUBMODULE / source).is_file():
+        pytest.skip("the franka_description submodule is not checked out")
+    assert generator.source_path(source).is_file()
 
 
 @pytest.mark.parametrize("source, count", SOURCES.items())

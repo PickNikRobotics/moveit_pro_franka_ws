@@ -146,6 +146,17 @@ The controller manager works out the chain of transitions, so an unconfigured co
 ### L133 the checks in `createGoal()`
 franka_spine_msgs' MoveAbsolute action requires velocity, acceleration and deceleration greater than zero, so the Behavior rejects other values before it sends a goal. It does not check the height: the travel lives in the spine and in the robot description, and "Move Spine Absolute" checks it with `CreateSpineState`.
 
+## src/franka_meshes/script/generate_collision_decomposition.py
+
+### L63-L67 the fixed decomposition settings
+The seed and the three resolution and threshold settings are pinned so a rerun reproduces the committed files byte for byte, which is what makes `--check` a drift check rather than a diff of two random runs. Changing any of them rewrites every part, so change them only with a reason and rerun the package tests.
+
+### L69-L72 `MAX_PARTS`
+A cap on the parts per mesh, not the number written: the decomposition returns fewer when it can, which is why the head ships fewer parts than its cap. Each cap is the fewest parts whose summed hull volume stays near the true mesh volume without going under, because a part that covers slightly too much is safer than one that leaves a hole in the collision model.
+
+### L96-L97, L116, L169 the lazy imports
+trimesh and coacd are imported inside the functions that need them, not at module scope, so the path layer and `--paths` work without them. The package test imports this module for that reason.
+
 ## src/franka_meshes/test/test_meshes.py
 
 ### L23-L26 the two tolerances

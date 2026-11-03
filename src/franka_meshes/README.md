@@ -36,6 +36,19 @@ MuJoCo collides a mesh as its convex hull, so a link whose collision mesh is far
 
 A URDF needs none of this: MoveIt collides the mesh itself, so it keeps loading the single upstream mesh. Only an MJCF should load the parts, each as its own `geom` on the same body.
 
+## Regenerating the collision parts
+
+`script/generate_collision_decomposition.py` writes them. It reads the five source meshes from the `franka_description` submodule, which it never writes, and writes each part into this package at the source mesh's own relative path, so a rerun overwrites the committed files in place. Its seed and decomposition settings are fixed, so a rerun reproduces them byte for byte.
+
+```bash
+cd src/franka_meshes
+python3 script/generate_collision_decomposition.py --paths   # resolve the paths only
+python3 script/generate_collision_decomposition.py --check   # committed files against a fresh run
+python3 script/generate_collision_decomposition.py           # rewrite them
+```
+
+Run it by hand when a source mesh changes, never at build or launch time. It needs `trimesh`, `coacd` and `scipy`, which are deliberately not workspace dependencies, so it is not installed with the package; `--paths` needs none of them and checks only that the submodule is checked out and the output paths resolve. After a rerun, run the tests below: they check the parts are still convex and still cover their source mesh.
+
 ## Why it is a package and not files in the submodule
 
 `src/external_dependencies/franka_description` is a submodule of Franka Robotics' own repository. A parent repository cannot add files inside a submodule, and a PickNik file placed inside any vendored upstream tree is liable to be removed by a vendored-refresh tool whose discard path runs `git restore` and `git clean -fd` over that directory, because upstream does not have the file. A package in this workspace's own tree is outside that blast radius.
