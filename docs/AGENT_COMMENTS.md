@@ -146,6 +146,14 @@ The controller manager works out the chain of transitions, so an unconfigured co
 ### L133 the checks in `createGoal()`
 franka_spine_msgs' MoveAbsolute action requires velocity, acceleration and deceleration greater than zero, so the Behavior rejects other values before it sends a goal. It does not check the height: the travel lives in the spine and in the robot description, and "Move Spine Absolute" checks it with `CreateSpineState`.
 
+## src/franka_meshes/test/test_meshes.py
+
+### L23-L26 the two tolerances
+The convexity tolerance is the float32 round-off of a vertex against a face plane of its own hull, so a truly convex part sits orders of magnitude inside it and a part that is not convex fails by a visible distance. The coverage tolerance is a bound on how far the approximate decomposition reaches past the source mesh's bounding box; the committed parts stay well inside it, and the direction matters more than the size, because a part that covers slightly too much is safer than one that leaves a hole.
+
+### L73-L74 the install check
+The meshes are only usable through `package://`, which resolves to the ament share directory, so this is what proves the install rule rather than the source tree. It skips when ament_index_python is missing or the package is not installed, so the geometry checks still run outside a built workspace.
+
 ## src/mobile_fr3_duo_hw/config/config.yaml
 
 ### L8 based on mobile_fr3_duo_sim, not mobile_fr3_duo_mock

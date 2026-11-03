@@ -18,6 +18,12 @@ Third-party files:
     finger_1.obj, are copied unchanged, except tmrv0_2_visual.stl, which
     PickNik Inc. converted from franka_description's
     meshes/robots/tmrv0_2/visual/tmrv0_2.dae.
+  - The meshes in src/franka_meshes/ are derived from it by PickNik Inc., not
+    copied from it: convex collision parts of five of its collision meshes, and
+    OBJ conversions of its visual meshes. That package's own NOTICE names the
+    source mesh of every file, the provenance commits and the modifications,
+    and carries the Apache License text in
+    src/franka_meshes/meshes/LICENSE-franka_description.
   - src/fr3_duo_spine_sim/mjcf/fr3_duo.xml and
     src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml are converted by PickNik Inc.
     from its robot descriptions (kinematics, inertials and dynamics of the FR3
