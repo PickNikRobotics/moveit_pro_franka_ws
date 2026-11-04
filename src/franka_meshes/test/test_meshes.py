@@ -29,6 +29,9 @@ STL_HEADER_NOTICE = "Modified by PickNik Inc."
 CONVEX_TOLERANCE = 1e-5
 # The decomposition is approximate, so a part may reach slightly past the source mesh.
 COVERAGE_TOLERANCE = 0.0015
+# How far outside every part a source vertex may sit before it counts as uncovered. Well above
+# what the committed parts need, and far below the size of a hole a lost part would leave.
+CONTAINMENT_TOLERANCE = 0.00025
 
 
 def collision_parts():
@@ -65,6 +68,27 @@ def bounds(vertices):
         (min(v[axis] for v in vertices), max(v[axis] for v in vertices))
         for axis in range(3)
     ]
+
+
+def face_planes(path):
+    """One convex part as unit face planes and its bounds, for a point-inside test."""
+    planes = []
+    for normal, corner, _, _ in read_stl(path)[1]:
+        length = sum(value * value for value in normal) ** 0.5
+        if length == 0.0:
+            continue
+        unit = [value / length for value in normal]
+        planes.append((unit, sum(unit[axis] * corner[axis] for axis in range(3))))
+    return planes, bounds(stl_vertices(path))
+
+
+def distance_outside(vertex, planes):
+    """How far a vertex sits outside a convex part: at most zero when it is inside."""
+    worst = 0.0
+    for unit, plane in planes:
+        beyond = sum(unit[axis] * vertex[axis] for axis in range(3)) - plane
+        worst = max(worst, beyond)
+    return worst
 
 
 def test_every_mesh_is_committed():
@@ -144,6 +168,43 @@ def test_generator_resolves_its_input(source):
     if not (SUBMODULE / source).is_file():
         pytest.skip("the franka_description submodule is not checked out")
     assert generator.source_path(source).is_file()
+
+
+@pytest.mark.parametrize("source, count", SOURCES.items())
+def test_every_source_vertex_lies_inside_a_part(source, count):
+    """Catches a hole the bounds check cannot see, such as a lost interior part."""
+    if not (SUBMODULE / source).is_file():
+        pytest.skip("the franka_description submodule is not checked out")
+    stem = Path(source).stem
+    parts = [face_planes(path) for path in sorted(MESHES.rglob(f"{stem}_convex_*.stl"))]
+    worst = 0.0
+    culprit = None
+    for vertex in set(stl_vertices(SUBMODULE / source)):
+        nearest = min(
+            (
+                distance_outside(vertex, planes)
+                for planes, box in parts
+                # Only a part whose bounds reach the vertex can contain it.
+                if all(
+                    box[axis][0] - CONTAINMENT_TOLERANCE
+                    <= vertex[axis]
+                    <= box[axis][1] + CONTAINMENT_TOLERANCE
+                    for axis in range(3)
+                )
+            ),
+            default=float("inf"),
+        )
+        if nearest > worst:
+            worst, culprit = nearest, vertex
+    reach = (
+        "beyond the bounds of"
+        if worst == float("inf")
+        else f"{worst * 1000:.3f} mm outside"
+    )
+    assert worst < CONTAINMENT_TOLERANCE, (
+        f"{stem}: the source vertex {culprit} sits {reach} every one of the "
+        f"{len(parts)} committed parts, so the decomposition has a hole there"
+    )
 
 
 @pytest.mark.parametrize("source, count", SOURCES.items())

@@ -91,6 +91,18 @@ def part_paths(relative, count):
     ]
 
 
+def committed_parts(relative):
+    """Every part file this package already holds for one source mesh."""
+    part = PART_MESHES / relative
+    return sorted(part.parent.glob(f"{part.stem}_convex_*.stl"))
+
+
+def obsolete_parts(relative, count):
+    """Committed parts a run of this many hulls would not write, so they are stale."""
+    written = set(part_paths(relative, count))
+    return [path for path in committed_parts(relative) if path not in written]
+
+
 def decompose(mesh, max_parts):
     """Convex hulls of one mesh's approximate convex decomposition, largest volume first."""
     import coacd
@@ -128,11 +140,7 @@ def report_paths():
         mark = "found" if source.is_file() else "MISSING"
         if not source.is_file():
             missing.append(source)
-        committed = sorted(
-            part_paths(relative, max_parts)[0].parent.glob(
-                f"{Path(relative).stem}_convex_*.stl"
-            )
-        )
+        committed = committed_parts(relative)
         print(f"{relative}\n    source {mark}: {source}")
         print(
             f"    parts in this package: {len(committed)} in {committed[0].parent}"
@@ -169,6 +177,7 @@ def main():
     import trimesh
 
     drifted = []
+    stale = []
     for relative, max_parts in MAX_PARTS.items():
         source = source_path(relative)
         mesh = trimesh.load(source, force="mesh")
@@ -188,11 +197,23 @@ def main():
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(written)
 
-    if args.check and drifted:
-        print("\ndrifted from a fresh run:", file=sys.stderr)
-        for path in drifted:
-            print(f"    {path.relative_to(PART_MESHES)}", file=sys.stderr)
-        return 1
+        # A run returning fewer hulls than are committed writes no file over the
+        # higher-index ones, so compare the whole set and not just what it wrote.
+        obsolete = obsolete_parts(relative, len(hulls))
+        stale.extend(obsolete)
+        if not args.check:
+            for path in obsolete:
+                path.unlink()
+                print(f"    removed stale {path.name}")
+
+    if args.check:
+        for label, paths in (("drifted from a fresh run", drifted), ("stale", stale)):
+            if paths:
+                print(f"\n{label}:", file=sys.stderr)
+                for path in paths:
+                    print(f"    {path.relative_to(PART_MESHES)}", file=sys.stderr)
+        if drifted or stale:
+            return 1
     return 0
 
 

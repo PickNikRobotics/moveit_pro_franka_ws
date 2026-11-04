@@ -5,9 +5,9 @@
   <description>
     PickNik mesh assets for Franka robots: convex collision parts for the
     collision meshes whose own shape is not convex, and OBJ copies of the
-    visual meshes for simulators that cannot read COLLADA. Each file sits at
-    franka_description's own relative path, so a consumer changes only the
-    package name in a package:// reference.
+    visual meshes for simulators that cannot read COLLADA. A file keeps
+    franka_description's own directory and changes the file name: a collision
+    part adds a _convex_NN suffix, and a visual mesh becomes _visual.obj.
   </description>
 
   <maintainer email="support@picknik.ai">MoveIt Pro Maintainer</maintainer>
