@@ -12,6 +12,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>mobile_fr3_duo_mock</depend>
+  <!-- The MJCF loads its convex collision parts from here over package://. -->
+  <exec_depend>franka_meshes</exec_depend>
   <exec_depend>picknik_mujoco_ros</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>

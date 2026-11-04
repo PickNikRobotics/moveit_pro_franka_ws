@@ -54,6 +54,12 @@ moveit_pro run -c mobile_fr3_duo_sim
 | `test/` | tests for the odometry bridge |
 | `params/` | the Nav2 layer for AMCL and the lasers, and slam_toolbox parameters |
 
+## Collision geometry
+
+MuJoCo collides a mesh as its convex hull, so a link whose collision mesh is far from convex collides as the filled-in shape. The FR3 v2 link3, link4 and link5, the head and the FR3 Duo mount each load an already-convex part set from [`franka_meshes`](../franka_meshes) over `package://` instead of the single mesh, one `geom` per part on the same body. Each link's visual `geom` keeps the local mesh in `mjcf/assets/`, and the bodies keep their explicit `<inertial>`, so masses and inertias are unchanged.
+
+Collision volume as a multiple of the link's true mesh volume, measured in the loaded model: head 5.16x to 1.106x, link5 1.79x to 1.015x, mount 1.45x to 0.998x, link3 1.35x to 1.027x, link4 1.35x to 1.024x. The FR3 Duo cover still collides as its own hull, at 1.34x, because it was not decomposed.
+
 ## Third-party assets
 
 The finger meshes `finger_0.obj` and `finger_1.obj` in `mjcf/assets/` come from [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) (Apache-2.0, see [`LICENSE-mujoco_menagerie`](mjcf/assets/LICENSE-mujoco_menagerie)).

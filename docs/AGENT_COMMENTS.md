@@ -146,6 +146,13 @@ The controller manager works out the chain of transitions, so an unconfigured co
 ### L133 the checks in `createGoal()`
 franka_spine_msgs' MoveAbsolute action requires velocity, acceleration and deceleration greater than zero, so the Behavior rejects other values before it sends a goal. It does not check the height: the travel lives in the spine and in the robot description, and "Move Spine Absolute" checks it with `CreateSpineState`.
 
+## src/fr3_duo_spine_sim/mjcf/fr3_duo.xml, src/mobile_fr3_duo_sim/mjcf/mobile_fr3_duo.xml
+
+### the `_convex_` geoms and their `<mesh>` declarations
+Each affected link had two geoms: a visual twin carrying `contype="0" conaffinity="0" density="0"`, and one colliding geom. Only the colliding geom became a part set, so the view still shows the single mesh from `mjcf/assets/` while contact uses the parts. The part geoms carry no mass setting, which is safe because every affected body declares an explicit `<inertial>` and the compiler leaves `inertiafromgeom` at its default, so MuJoCo takes the authored values and ignores geom-derived mass; both models load with bit-identical `body_mass` and `body_inertia`.
+
+The `package://` URIs resolve through the `mujoco_package_uri` resource provider that MoveIt Pro registers with MuJoCo, which is why `meshdir` still serves the local asset files in the same document. A mistyped URI fails loudly at model load, so it needs no separate test.
+
 ## src/franka_meshes/script/generate_collision_decomposition.py
 
 ### L63-L67 the fixed decomposition settings

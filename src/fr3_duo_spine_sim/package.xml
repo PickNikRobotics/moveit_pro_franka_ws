@@ -14,6 +14,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <exec_depend>fr3_duo_spine_mock</exec_depend>
   <exec_depend>franka_description</exec_depend>
+  <!-- The MJCF loads its convex collision parts from here over package://. -->
+  <exec_depend>franka_meshes</exec_depend>
   <exec_depend>picknik_mujoco_ros</exec_depend>
   <export>
     <build_type>ament_cmake</build_type>
